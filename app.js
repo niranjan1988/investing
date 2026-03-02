@@ -82,6 +82,13 @@ const deactivateStockBtn = document.getElementById('deactivateStockBtn');
 const deactivatedList = document.getElementById('deactivatedList');
 const deactivatedEmpty = document.getElementById('deactivatedEmpty');
 
+// Add Stock Modal
+const addStockBtn = document.getElementById('addStockBtn');
+const addStockModalOverlay = document.getElementById('addStockModalOverlay');
+const addStockModalClose = document.getElementById('addStockModalClose');
+const addStockForm = document.getElementById('addStockForm');
+const submitAddStockBtn = document.getElementById('submitAddStockBtn');
+
 let activeModalTicker = null;
 
 // Search & Filter states
@@ -93,8 +100,8 @@ const lastUpdatedEl = document.getElementById('lastUpdated');
 // Data Fetching
 // ============================================
 
-async function fetchStockData() {
-    showLoading(true);
+async function fetchStockData(silent = false) {
+    if (!silent) showLoading(true);
     try {
         const response = await fetch('/api/stocks');
         if (!response.ok) {
@@ -117,9 +124,9 @@ async function fetchStockData() {
         renderTable();
     } catch (err) {
         console.error('Failed to fetch stock data:', err);
-        showError(err.message);
+        if (!silent) showError(err.message);
     } finally {
-        showLoading(false);
+        if (!silent) showLoading(false);
     }
 }
 
@@ -538,7 +545,13 @@ if (refreshBtn) {
 // Deactivated Stocks Logic
 // ----------------------------------------------------
 
-async function toggleStockStatus(ticker, active) {
+async function toggleStockStatus(ticker, active, btnElement = null) {
+    if (btnElement) {
+        btnElement.disabled = true;
+        btnElement.textContent = active ? 'Reactivating...' : 'Deactivating...';
+        btnElement.style.opacity = '0.5';
+    }
+
     try {
         const res = await fetch('/api/stocks/toggle', {
             method: 'POST',
@@ -547,11 +560,22 @@ async function toggleStockStatus(ticker, active) {
         });
         const data = await res.json();
         if (data.success) {
-            fetchStockData(); // Refresh main table
+            if (!active) {
+                // Optimistically remove from main table data
+                stocksData = stocksData.filter(s => s.ticker !== ticker);
+                renderTable();
+            }
+            fetchStockData(true); // Background refresh
             return true;
         }
     } catch (e) {
         console.error('Failed to toggle stock', e);
+    }
+
+    if (btnElement) {
+        btnElement.disabled = false;
+        btnElement.textContent = active ? 'Reactivate' : 'Deactivate';
+        btnElement.style.opacity = '1';
     }
     return false;
 }
@@ -559,9 +583,12 @@ async function toggleStockStatus(ticker, active) {
 if (deactivateStockBtn) {
     deactivateStockBtn.addEventListener('click', async () => {
         if (!activeModalTicker) return;
-        const success = await toggleStockStatus(activeModalTicker, false);
+        const success = await toggleStockStatus(activeModalTicker, false, deactivateStockBtn);
         if (success) {
             closeModal();
+            deactivateStockBtn.disabled = false;
+            deactivateStockBtn.textContent = 'Deactivate';
+            deactivateStockBtn.style.opacity = '1';
         } else {
             alert('Failed to deactivate stock.');
         }
@@ -608,7 +635,7 @@ async function loadDeactivatedStocks() {
             btn.style.fontSize = '0.8rem';
 
             btn.onclick = async () => {
-                const success = await toggleStockStatus(stock.ticker, true);
+                const success = await toggleStockStatus(stock.ticker, true, btn);
                 if (success) {
                     loadDeactivatedStocks(); // Reload list
                 }
@@ -645,6 +672,73 @@ deactivatedModalOverlay.addEventListener('click', (e) => {
         document.body.style.overflow = '';
     }
 });
+
+// ----------------------------------------------------
+// Add Stock Logic
+// ----------------------------------------------------
+
+if (addStockBtn) {
+    addStockBtn.addEventListener('click', () => {
+        addStockModalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('addTicker').focus();
+    });
+}
+
+if (addStockModalClose) {
+    addStockModalClose.addEventListener('click', () => {
+        addStockModalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+}
+
+addStockModalOverlay.addEventListener('click', (e) => {
+    if (e.target === addStockModalOverlay) {
+        addStockModalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
+
+if (addStockForm) {
+    addStockForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const ticker = document.getElementById('addTicker').value;
+        const sector = document.getElementById('addSector').value;
+        const cap = document.getElementById('addCap').value;
+
+        submitAddStockBtn.disabled = true;
+        submitAddStockBtn.textContent = 'Adding...';
+        submitAddStockBtn.style.opacity = '0.7';
+
+        try {
+            const res = await fetch('/api/stocks/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticker, sector, cap })
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                addStockForm.reset();
+                addStockModalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+
+                // Show loading spinner for adding net-new stock that has no cache
+                fetchStockData(false);
+            } else {
+                alert(data.error || 'Failed to add stock');
+            }
+        } catch (e) {
+            console.error('Add stock error', e);
+            alert('Failed to add stock. Please try again.');
+        } finally {
+            submitAddStockBtn.disabled = false;
+            submitAddStockBtn.textContent = 'Add Stock';
+            submitAddStockBtn.style.opacity = '1';
+        }
+    });
+}
 
 // ============================================
 // Theme Toggle

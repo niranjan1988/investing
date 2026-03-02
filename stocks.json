@@ -11,31 +11,23 @@
     "PLTR",
     "AMD",
     "ADBE",
-    "INTC",
-    "IBM",
-    "TXN",
     "PANW",
     "NOW",
     "SNPS",
     "CDNS",
     "APH",
     "CRWD",
-    "SNOW",
     "DDOG",
     "MRVL",
     "KLAC",
     "LRCX",
     "FTNT",
     "ZS",
-    "OKTA",
-    "MDB",
     "LLY",
     "ABBV",
-    "MRK",
     "ABT",
     "VRTX",
-    "REGN",
-    "ORCL"
+    "NET"
   ],
   "universe": [
     {
@@ -216,6 +208,11 @@
     {
       "ticker": "REGN",
       "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "NET",
+      "sector": "Technology",
       "cap": "large"
     }
   ]

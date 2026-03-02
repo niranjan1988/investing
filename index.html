@@ -79,6 +79,12 @@
                         <line x1="2" y1="2" x2="22" y2="22"></line>
                     </svg>
                 </button>
+                <button class="theme-toggle" id="addStockBtn" title="Add tracked stock" aria-label="Add stock">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
                 <div class="last-updated" id="lastUpdated">
                     Updated: Feb 2026
                 </div>
@@ -345,6 +351,56 @@
                     style="display: none; padding: 20px; text-align: center; color: var(--text-muted);">
                     No deactivated stocks.
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Stock Modal -->
+    <div class="modal-overlay" id="addStockModalOverlay">
+        <div class="modal" id="addStockModal">
+            <button class="modal-close" id="addStockModalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header" style="margin-bottom: 20px;">
+                <div class="modal-name" style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">Add
+                    Tracked Stock</div>
+            </div>
+            <div class="modal-body">
+                <form id="addStockForm" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label for="addTicker"
+                            style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Ticker
+                            Symbol</label>
+                        <input type="text" id="addTicker" required placeholder="e.g. AAPL"
+                            style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                    </div>
+                    <div>
+                        <label for="addSector"
+                            style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Sector</label>
+                        <select id="addSector" required
+                            style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                            <option value="Technology">Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="addCap"
+                            style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Cap
+                            Size</label>
+                        <select id="addCap" required
+                            style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                            <option value="mega">Mega Cap (>$200B)</option>
+                            <option value="large">Large Cap ($10B-$200B)</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="submitAddStockBtn"
+                        style="margin-top: 10px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: background 0.2s;">
+                        Add Stock
+                    </button>
+                </form>
             </div>
         </div>
     </div>

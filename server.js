@@ -388,6 +388,43 @@ app.post('/api/stocks/toggle', (req, res) => {
     }
 });
 
+// API route to add a new stock
+app.post('/api/stocks/add', (req, res) => {
+    try {
+        const { ticker, sector, cap } = req.body;
+        if (!ticker || !sector || !cap) {
+            return res.status(400).json({ error: 'Ticker, sector, and cap are required' });
+        }
+
+        const cleanTicker = ticker.toUpperCase().trim();
+
+        // Check if already in universe
+        const exists = IN_MEMORY_STOCKS.universe.find(s => s.ticker === cleanTicker);
+        if (exists) {
+            const isActive = IN_MEMORY_STOCKS.active.includes(cleanTicker);
+            const errorMsg = isActive
+                ? 'Stock already exists.'
+                : 'Stock already exists in the deactivated list. Please reactivate it.';
+            return res.status(400).json({ error: errorMsg });
+        }
+
+        IN_MEMORY_STOCKS.universe.push({ ticker: cleanTicker, sector, cap });
+
+        // Ensure it's active
+        let newActive = new Set(IN_MEMORY_STOCKS.active);
+        newActive.add(cleanTicker);
+        IN_MEMORY_STOCKS.active = Array.from(newActive);
+
+        saveStocks();
+        fullDataCache = null; // invalidate cache
+
+        res.json({ success: true, ticker: cleanTicker });
+    } catch (err) {
+        console.error('[API] Error adding stock:', err.message);
+        res.status(500).json({ error: 'Failed to add stock' });
+    }
+});
+
 app.get('/api/deactivated', (req, res) => {
     try {
         const activeTickers = new Set(IN_MEMORY_STOCKS.active);
