@@ -162,6 +162,8 @@
                 <select id="sortSelect" class="sort-select">
                     <option value="marketcap">Market Cap</option>
                     <option value="drawdown">% From ATH</option>
+                    <option value="cagr5Y">5Y CAGR</option>
+                    <option value="cagr10Y">10Y CAGR</option>
                     <option value="name">Name</option>
                     <option value="price">Price</option>
                 </select>
@@ -172,6 +174,7 @@
                 </button>
             </div>
         </section>
+
 
         <!-- Stock Table -->
         <section class="table-section">
@@ -187,6 +190,8 @@
                             <th class="col-price">Current Price</th>
                             <th class="col-ath">All-Time High</th>
                             <th class="col-drawdown">% From ATH</th>
+                            <th class="col-cagr">5Y CAGR</th>
+                            <th class="col-cagr">10Y CAGR</th>
                             <th class="col-bar">Drawdown</th>
                         </tr>
                     </thead>
@@ -268,14 +273,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-details">
+                <div class="modal-details" style="grid-template-columns: 1fr 1fr;">
                     <div class="detail-row">
                         <span class="detail-label">Market Cap</span>
                         <span class="detail-value" id="modalMcap"></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Category</span>
-                        <span class="detail-value" id="modalCategory"></span>
+                        <span class="detail-label">1Y CAGR</span>
+                        <span class="detail-value" id="modalCagr1Y"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">3Y CAGR</span>
+                        <span class="detail-value" id="modalCagr3Y"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">5Y CAGR</span>
+                        <span class="detail-value" id="modalCagr5Y"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">10Y CAGR</span>
+                        <span class="detail-value" id="modalCagr10Y"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">$ Below ATH</span>
@@ -284,6 +301,12 @@
                     <div class="detail-row">
                         <span class="detail-label">Recovery Needed</span>
                         <span class="detail-value" id="modalRecovery"></span>
+                    </div>
+                </div>
+                <div class="modal-news" id="modalNewsContainer">
+                    <div class="viz-label" style="margin-top:20px; margin-bottom:12px;">Latest News</div>
+                    <div id="modalNewsList" class="news-list">
+                        <!-- News items injected here -->
                     </div>
                 </div>
             </div>

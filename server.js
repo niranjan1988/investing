@@ -176,13 +176,34 @@ async function fetchBatchQuotes(tickers) {
 }
 
 /**
- * Fetch ATH for a single ticker using the v8 chart API (no auth needed).
- * Uses monthly historical data to find the all-time high.
+ * Fetch ATH and historical prices for a single ticker using the v8 chart API (no auth needed).
+ * Uses monthly historical data to find the all-time high and past prices.
  */
+function getPriceAtYearsAgo(timestamps, closes, yearsAgo) {
+    const targetTime = Date.now() / 1000 - (yearsAgo * 365.25 * 24 * 3600);
+    let closestIndex = -1;
+    let minDiff = Infinity;
+
+    for (let i = 0; i < timestamps.length; i++) {
+        if (closes[i] != null && !isNaN(closes[i])) {
+            const diff = Math.abs(timestamps[i] - targetTime);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closestIndex = i;
+            }
+        }
+    }
+    // Only return if we actually have data that is reasonably close (e.g. within 60 days)
+    if (closestIndex !== -1 && minDiff < 60 * 24 * 3600) {
+        return closes[closestIndex];
+    }
+    return null;
+}
+
 async function fetchATH(ticker) {
     // Check cache first
     if (athCache[ticker] && (Date.now() - athCache[ticker].time < ATH_CACHE_TTL)) {
-        return athCache[ticker].value;
+        return athCache[ticker];
     }
 
     const yahooTicker = toYahooTicker(ticker);
@@ -207,13 +228,22 @@ async function fetchATH(ticker) {
 
         let ath = Math.max(...validHighs);
 
+        const timestamps = result.timestamp || [];
+        const closes = result.indicators?.quote?.[0]?.close || [];
+
+        const past1Y = getPriceAtYearsAgo(timestamps, closes, 1);
+        const past3Y = getPriceAtYearsAgo(timestamps, closes, 3);
+        const past5Y = getPriceAtYearsAgo(timestamps, closes, 5);
+        const past10Y = getPriceAtYearsAgo(timestamps, closes, 10);
+
         // Check if current price exceeds monthly bar highs
         const currentPrice = result.meta?.regularMarketPrice ?? 0;
         ath = Math.max(ath, currentPrice);
 
         // Cache
-        athCache[ticker] = { value: ath, time: Date.now() };
-        return ath;
+        const dataObj = { value: ath, past1Y, past3Y, past5Y, past10Y, time: Date.now() };
+        athCache[ticker] = dataObj;
+        return dataObj;
     } catch (err) {
         console.error(`[Yahoo] ATH error for ${ticker}:`, err.message);
         return null;
@@ -271,7 +301,12 @@ app.get('/api/stocks', async (req, res) => {
         // Combine data
         const stocks = STOCK_UNIVERSE.map(config => {
             const quote = quoteMap[config.ticker] || {};
-            const chartATH = athMap[config.ticker];
+            const chartData = athMap[config.ticker] || {};
+            const chartATH = chartData.value;
+            const past1Y = chartData.past1Y;
+            const past3Y = chartData.past3Y;
+            const past5Y = chartData.past5Y;
+            const past10Y = chartData.past10Y;
 
             // Use chart ATH if available, otherwise fall back to 52-week high
             const ath = chartATH || quote.fiftyTwoWeekHigh || 0;
@@ -282,6 +317,11 @@ app.get('/api/stocks', async (req, res) => {
 
             if (price <= 0) return null;
 
+            function computeCAGR(current, past, duration) {
+                if (!past || past <= 0 || !current || current <= 0) return null;
+                return (Math.pow(current / past, 1 / duration) - 1) * 100;
+            }
+
             return {
                 ticker: config.ticker,
                 name: quote.name || config.ticker,
@@ -291,6 +331,10 @@ app.get('/api/stocks', async (req, res) => {
                 previousClose: Math.round((quote.previousClose || 0) * 100) / 100,
                 mcap: Math.round(quote.mcap * 10) / 10 || 0,
                 ath: Math.round(finalATH * 100) / 100,
+                cagr1Y: computeCAGR(price, past1Y, 1),
+                cagr3Y: computeCAGR(price, past3Y, 3),
+                cagr5Y: computeCAGR(price, past5Y, 5),
+                cagr10Y: computeCAGR(price, past10Y, 10),
             };
         }).filter(Boolean);
 

@@ -199,6 +199,12 @@ function getFilteredAndSortedStocks() {
             case 'price':
                 comparison = b.price - a.price;
                 break;
+            case 'cagr5Y':
+                comparison = (b.cagr5Y ?? -Infinity) - (a.cagr5Y ?? -Infinity);
+                break;
+            case 'cagr10Y':
+                comparison = (b.cagr10Y ?? -Infinity) - (a.cagr10Y ?? -Infinity);
+                break;
         }
         return sortAscending ? -comparison : comparison;
     });
@@ -239,7 +245,15 @@ function renderTable() {
                         </div>
                         <div class="stock-details">
                             <span class="stock-ticker">${stock.ticker}</span>
-                            <span class="stock-name">${stock.name}</span>
+                            <div class="stock-name-row">
+                                <span class="stock-name">${stock.name}</span>
+                                <a href="https://www.tradingview.com/chart/?symbol=${stock.ticker}" target="_blank" class="tv-btn" onclick="event.stopPropagation()" aria-label="Open in TradingView" title="Open in TradingView">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                                        <polyline points="7 7 17 7 17 17"></polyline>
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </td>
@@ -256,6 +270,16 @@ function renderTable() {
                 <td class="col-drawdown">
                     <span class="drawdown-cell ${drawdownClass}">
                         ${drawdown <= 0 ? '🟢 ATH' : '-' + drawdown.toFixed(2) + '%'}
+                    </span>
+                </td>
+                <td class="col-cagr">
+                    <span class="cagr-cell ${stock.cagr5Y === null ? '' : (stock.cagr5Y >= 0 ? 'cagr-pos' : 'cagr-neg')}">
+                        ${stock.cagr5Y === null || isNaN(stock.cagr5Y) ? '—' : (stock.cagr5Y >= 0 ? '+' : '') + stock.cagr5Y.toFixed(2) + '%'}
+                    </span>
+                </td>
+                <td class="col-cagr">
+                    <span class="cagr-cell ${stock.cagr10Y === null ? '' : (stock.cagr10Y >= 0 ? 'cagr-pos' : 'cagr-neg')}">
+                        ${stock.cagr10Y === null || isNaN(stock.cagr10Y) ? '—' : (stock.cagr10Y >= 0 ? '+' : '') + stock.cagr10Y.toFixed(2) + '%'}
                     </span>
                 </td>
                 <td class="col-bar">
@@ -316,6 +340,41 @@ function animateCounter(elementId, target) {
 // Modal
 // ============================================
 
+async function fetchNews(ticker) {
+    const newsContainer = document.getElementById('modalNewsList');
+    if (!newsContainer) return;
+
+    newsContainer.innerHTML = '<div class="news-loading"><span>Loading latest news...</span></div>';
+
+    try {
+        const response = await fetch(`/api/news/${ticker}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+        if (!data.news || data.news.length === 0) {
+            newsContainer.innerHTML = '<div class="news-loading">No recent news found.</div>';
+            return;
+        }
+
+        newsContainer.innerHTML = data.news.slice(0, 4).map(item => {
+            const date = new Date(item.providerPublishTime * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+            return `
+                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="news-item">
+                    <span class="news-title">${item.title}</span>
+                    <div class="news-meta">
+                        <span>${item.publisher || 'Yahoo Finance'}</span>
+                        <span>•</span>
+                        <span>${date}</span>
+                    </div>
+                </a>
+            `;
+        }).join('');
+    } catch (err) {
+        newsContainer.innerHTML = '<div class="news-error">Failed to load news.</div>';
+        console.error('Failed to fetch news:', err);
+    }
+}
+
 function openModal(ticker) {
     const stock = stocksData.find(s => s.ticker === ticker);
     if (!stock) return;
@@ -335,9 +394,21 @@ function openModal(ticker) {
     drawdownEl.className = 'metric-value' + (drawdown <= 0 ? ' at-ath-modal' : '');
 
     document.getElementById('modalMcap').textContent = formatMarketCap(stock.mcap);
-    document.getElementById('modalCategory').textContent = stock.cap === 'mega' ? 'Mega Cap (>$200B)' : 'Large Cap ($10B-$200B)';
     document.getElementById('modalDollarBelow').textContent = drawdown <= 0 ? '—' : formatPrice(dollarsBelow);
     document.getElementById('modalRecovery').textContent = drawdown <= 0 ? '—' : '+' + recoveryNeeded.toFixed(2) + '%';
+
+    const formatCagr = (val) => (val === null || isNaN(val)) ? '—' : (val >= 0 ? '+' : '') + val.toFixed(2) + '%';
+    const getCagrClass = (val) => (val === null || isNaN(val)) ? '' : (val >= 0 ? 'price-up' : 'price-down');
+
+    const cagr1El = document.getElementById('modalCagr1Y');
+    const cagr3El = document.getElementById('modalCagr3Y');
+    const cagr5El = document.getElementById('modalCagr5Y');
+    const cagr10El = document.getElementById('modalCagr10Y');
+
+    if (cagr1El) { cagr1El.textContent = formatCagr(stock.cagr1Y); cagr1El.className = 'detail-value ' + getCagrClass(stock.cagr1Y); }
+    if (cagr3El) { cagr3El.textContent = formatCagr(stock.cagr3Y); cagr3El.className = 'detail-value ' + getCagrClass(stock.cagr3Y); }
+    if (cagr5El) { cagr5El.textContent = formatCagr(stock.cagr5Y); cagr5El.className = 'detail-value ' + getCagrClass(stock.cagr5Y); }
+    if (cagr10El) { cagr10El.textContent = formatCagr(stock.cagr10Y); cagr10El.className = 'detail-value ' + getCagrClass(stock.cagr10Y); }
 
     // Viz bar
     const fillPct = stock.ath > 0 ? (stock.price / stock.ath) * 100 : 0;
@@ -348,6 +419,9 @@ function openModal(ticker) {
 
     modalOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Fetch news
+    fetchNews(ticker);
 }
 
 function closeModal() {
@@ -460,7 +534,7 @@ function initTheme() {
 }
 
 function toggleTheme() {
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const isLight = document.documentElement.getAttribute('data-theme') === 'dark';
     if (isLight) {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('stockpulse-theme', 'dark');
