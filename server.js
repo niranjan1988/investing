@@ -1,0 +1,326 @@
+const express = require('express');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+// ============================================
+// Yahoo Finance Ticker Mapping
+// ============================================
+function toYahooTicker(ticker) {
+    const map = { 'BRK.B': 'BRK-B' };
+    return map[ticker] || ticker;
+}
+
+function fromYahooTicker(yahooTicker) {
+    const map = { 'BRK-B': 'BRK.B' };
+    return map[yahooTicker] || yahooTicker;
+}
+
+// ============================================
+// Stock Universe - Technology & Healthcare Only
+// ============================================
+const STOCK_UNIVERSE = [
+    // ── TECHNOLOGY ── MEGA CAP ──
+
+    { ticker: "NVDA", sector: "Technology", cap: "mega" },
+    { ticker: "AAPL", sector: "Technology", cap: "mega" },
+    { ticker: "GOOGL", sector: "Technology", cap: "mega" },
+    { ticker: "AMZN", sector: "Technology", cap: "mega" },
+    { ticker: "MSFT", sector: "Technology", cap: "mega" },
+    { ticker: "META", sector: "Technology", cap: "mega" },
+    { ticker: "TSLA", sector: "Technology", cap: "mega" },
+    { ticker: "AVGO", sector: "Technology", cap: "mega" },
+    { ticker: "ORCL", sector: "Technology", cap: "mega" },
+    { ticker: "PLTR", sector: "Technology", cap: "mega" },
+    { ticker: "AMD", sector: "Technology", cap: "mega" },
+    { ticker: "ADBE", sector: "Technology", cap: "mega" },
+    { ticker: "INTC", sector: "Technology", cap: "mega" },
+    { ticker: "IBM", sector: "Technology", cap: "mega" },
+
+    // ── TECHNOLOGY ── LARGE CAP ──
+
+    { ticker: "TXN", sector: "Technology", cap: "large" },
+    { ticker: "PANW", sector: "Technology", cap: "large" },
+    { ticker: "NOW", sector: "Technology", cap: "large" },
+    { ticker: "SNPS", sector: "Technology", cap: "large" },
+    { ticker: "CDNS", sector: "Technology", cap: "large" },
+    { ticker: "APH", sector: "Technology", cap: "large" },
+    { ticker: "CRWD", sector: "Technology", cap: "large" },
+    { ticker: "SNOW", sector: "Technology", cap: "large" },
+    { ticker: "DDOG", sector: "Technology", cap: "large" },
+    { ticker: "MRVL", sector: "Technology", cap: "large" },
+    { ticker: "KLAC", sector: "Technology", cap: "large" },
+    { ticker: "LRCX", sector: "Technology", cap: "large" },
+    { ticker: "FTNT", sector: "Technology", cap: "large" },
+    { ticker: "ZS", sector: "Technology", cap: "large" },
+    { ticker: "OKTA", sector: "Technology", cap: "large" },
+    { ticker: "MDB", sector: "Technology", cap: "large" },
+
+    // ── HEALTHCARE / HEALTH TECH ── MEGA CAP ──
+
+    { ticker: "LLY", sector: "Healthcare", cap: "mega" },
+    { ticker: "ABBV", sector: "Healthcare", cap: "mega" },
+    { ticker: "MRK", sector: "Healthcare", cap: "mega" },
+    { ticker: "ABT", sector: "Healthcare", cap: "mega" },
+
+
+    // ── HEALTHCARE / HEALTH TECH ── LARGE CAP ──   
+
+    { ticker: "VRTX", sector: "Healthcare", cap: "large" },
+    { ticker: "REGN", sector: "Healthcare", cap: "large" },
+];
+
+// ============================================
+// Yahoo Finance Auth (Crumb + Cookie)
+// ============================================
+// Yahoo's v7 quote API now requires authentication via crumb+cookie.
+// We obtain these by first hitting fc.yahoo.com for cookies,
+// then fetching the crumb token.
+
+let yahooCrumb = null;
+let yahooCookies = null;
+let authTime = 0;
+const AUTH_TTL = 5 * 60 * 1000; // Refresh auth every 5 minutes
+
+const YAHOO_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+async function getYahooAuth() {
+    if (yahooCrumb && yahooCookies && (Date.now() - authTime < AUTH_TTL)) {
+        return { crumb: yahooCrumb, cookies: yahooCookies };
+    }
+
+    console.log('[Yahoo] Refreshing authentication...');
+
+    // Step 1: Get cookies from fc.yahoo.com
+    const cookieResp = await fetch('https://fc.yahoo.com', {
+        headers: { 'User-Agent': YAHOO_UA },
+        redirect: 'manual',
+    });
+    const setCookies = cookieResp.headers.getSetCookie?.() || [];
+    // Extract cookie values (join them)
+    const cookieStr = setCookies.map(c => c.split(';')[0]).join('; ');
+
+    // Step 2: Get crumb
+    const crumbResp = await fetch('https://query2.finance.yahoo.com/v1/test/getcrumb', {
+        headers: {
+            'User-Agent': YAHOO_UA,
+            'Cookie': cookieStr,
+        },
+    });
+    const crumb = await crumbResp.text();
+
+    if (!crumb || crumb.includes('<!DOCTYPE')) {
+        throw new Error('Failed to get Yahoo Finance crumb');
+    }
+
+    yahooCrumb = crumb;
+    yahooCookies = cookieStr;
+    authTime = Date.now();
+
+    console.log('[Yahoo] Authentication successful');
+    return { crumb, cookies: cookieStr };
+}
+
+// ============================================
+// Cache
+// ============================================
+const athCache = {};
+const ATH_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+
+let fullDataCache = null;
+let fullDataCacheTime = 0;
+const FULL_DATA_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// ============================================
+// Yahoo Finance API Functions
+// ============================================
+
+/**
+ * Fetch batch quotes using v7 API with crumb authentication.
+ * Returns a map of ticker -> { price, mcap, name, fiftyTwoWeekHigh }
+ */
+async function fetchBatchQuotes(tickers) {
+    const { crumb, cookies } = await getYahooAuth();
+    const yahooTickers = tickers.map(toYahooTicker);
+
+    // Yahoo allows up to ~200 symbols per request
+    const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${yahooTickers.join(',')}&crumb=${encodeURIComponent(crumb)}`;
+
+    const response = await fetch(url, {
+        headers: {
+            'User-Agent': YAHOO_UA,
+            'Cookie': cookies,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Yahoo quote API returned ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const results = data?.quoteResponse?.result || [];
+
+    const quoteMap = {};
+    for (const q of results) {
+        const ourTicker = fromYahooTicker(q.symbol);
+        quoteMap[ourTicker] = {
+            price: q.regularMarketPrice ?? 0,
+            mcap: (q.marketCap ?? 0) / 1e9, // Convert to billions
+            name: q.longName || q.shortName || ourTicker,
+            fiftyTwoWeekHigh: q.fiftyTwoWeekHigh ?? 0,
+        };
+    }
+    return quoteMap;
+}
+
+/**
+ * Fetch ATH for a single ticker using the v8 chart API (no auth needed).
+ * Uses monthly historical data to find the all-time high.
+ */
+async function fetchATH(ticker) {
+    // Check cache first
+    if (athCache[ticker] && (Date.now() - athCache[ticker].time < ATH_CACHE_TTL)) {
+        return athCache[ticker].value;
+    }
+
+    const yahooTicker = toYahooTicker(ticker);
+    try {
+        const url = `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=max&interval=1mo`;
+        const response = await fetch(url, {
+            headers: { 'User-Agent': YAHOO_UA },
+        });
+
+        if (!response.ok) {
+            console.warn(`[Yahoo] Chart ${response.status} for ${ticker}`);
+            return null;
+        }
+
+        const data = await response.json();
+        const result = data?.chart?.result?.[0];
+        if (!result) return null;
+
+        const highs = result.indicators?.quote?.[0]?.high || [];
+        const validHighs = highs.filter(h => h != null && !isNaN(h));
+        if (validHighs.length === 0) return null;
+
+        let ath = Math.max(...validHighs);
+
+        // Check if current price exceeds monthly bar highs
+        const currentPrice = result.meta?.regularMarketPrice ?? 0;
+        ath = Math.max(ath, currentPrice);
+
+        // Cache
+        athCache[ticker] = { value: ath, time: Date.now() };
+        return ath;
+    } catch (err) {
+        console.error(`[Yahoo] ATH error for ${ticker}:`, err.message);
+        return null;
+    }
+}
+
+/**
+ * Fetch ATHs for all tickers with concurrency control.
+ */
+async function fetchAllATHs(tickers, concurrency = 8) {
+    const results = {};
+    const queue = [...tickers];
+    let completed = 0;
+
+    async function worker() {
+        while (queue.length > 0) {
+            const ticker = queue.shift();
+            if (!ticker) break;
+            results[ticker] = await fetchATH(ticker);
+            completed++;
+            if (completed % 20 === 0) {
+                console.log(`[API] ATH progress: ${completed}/${tickers.length}`);
+            }
+        }
+    }
+
+    const workers = [];
+    for (let i = 0; i < Math.min(concurrency, tickers.length); i++) {
+        workers.push(worker());
+    }
+    await Promise.all(workers);
+    return results;
+}
+
+// ============================================
+// API Endpoint
+// ============================================
+app.get('/api/stocks', async (req, res) => {
+    try {
+        // Return cached data if fresh
+        if (fullDataCache && (Date.now() - fullDataCacheTime < FULL_DATA_CACHE_TTL)) {
+            return res.json(fullDataCache);
+        }
+
+        console.log('[API] Fetching fresh stock data...');
+        const startTime = Date.now();
+        const tickers = STOCK_UNIVERSE.map(s => s.ticker);
+
+        // Fetch quotes (with market cap) and ATHs in parallel
+        const [quoteMap, athMap] = await Promise.all([
+            fetchBatchQuotes(tickers),
+            fetchAllATHs(tickers, 8),
+        ]);
+
+        // Combine data
+        const stocks = STOCK_UNIVERSE.map(config => {
+            const quote = quoteMap[config.ticker] || {};
+            const chartATH = athMap[config.ticker];
+
+            // Use chart ATH if available, otherwise fall back to 52-week high
+            const ath = chartATH || quote.fiftyTwoWeekHigh || 0;
+
+            // Use actual current price - if at a new ATH, ath should reflect it
+            const price = quote.price || 0;
+            const finalATH = Math.max(ath, price);
+
+            if (price <= 0) return null;
+
+            return {
+                ticker: config.ticker,
+                name: quote.name || config.ticker,
+                sector: config.sector,
+                cap: config.cap,
+                price: Math.round(price * 100) / 100,
+                mcap: Math.round(quote.mcap * 10) / 10 || 0,
+                ath: Math.round(finalATH * 100) / 100,
+            };
+        }).filter(Boolean);
+
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(`[API] Fetched ${stocks.length}/${STOCK_UNIVERSE.length} stocks in ${elapsed}s`);
+
+        const responseData = {
+            stocks,
+            timestamp: new Date().toISOString(),
+            count: stocks.length,
+        };
+
+        // Cache
+        fullDataCache = responseData;
+        fullDataCacheTime = Date.now();
+
+        res.json(responseData);
+    } catch (err) {
+        console.error('[API] Error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch stock data', message: err.message });
+    }
+});
+
+// ============================================
+// Serve Static Files & Start
+// ============================================
+app.use(express.static(path.join(__dirname)));
+
+app.listen(PORT, () => {
+    console.log(`\n🚀 StockPulse server running at http://localhost:${PORT}\n`);
+    console.log(`   Stock universe: ${STOCK_UNIVERSE.length} tickers`);
+    console.log(`   Auth: Yahoo crumb+cookie (auto-refreshing)`);
+    console.log(`   ATH source: v8 Chart API (max range monthly)`);
+    console.log(`   Quotes: v7 Quote API (price + market cap)\n`);
+});

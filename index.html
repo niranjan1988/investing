@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech & Health Stock Tracker | ATH Analysis</title>
+    <meta name="description"
+        content="Track US Technology and Healthcare stocks with All-Time High analysis, current prices, and drawdown percentages.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                            <polyline points="16 7 22 7 22 13"></polyline>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>StockPulse</h1>
+                        <span class="logo-subtitle">TECH & HEALTH ATH TRACKER</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="search-container" id="searchContainer">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search stocks by name or ticker..."
+                        autocomplete="off">
+                    <kbd class="search-shortcut">⌘K</kbd>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="market-status" id="marketStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Market Data</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme" aria-label="Toggle theme">
+                    <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <div class="last-updated" id="lastUpdated">
+                    Updated: Feb 2026
+                </div>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <section class="summary-section">
+            <div class="summary-card" id="totalStocksCard">
+                <div class="summary-icon stocks-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 3h-8l-2 4h12z"></path>
+                    </svg>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-label">Total Stocks</span>
+                    <span class="summary-value" id="totalStocksValue">0</span>
+                </div>
+            </div>
+            <div class="summary-card" id="athCard">
+                <div class="summary-icon ath-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-label">At ATH</span>
+                    <span class="summary-value green" id="athCountValue">0</span>
+                </div>
+            </div>
+            <div class="summary-card" id="nearAthCard">
+                <div class="summary-icon near-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-label">Near ATH (&lt;5%)</span>
+                    <span class="summary-value yellow" id="nearAthValue">0</span>
+                </div>
+            </div>
+            <div class="summary-card" id="deepDrawdownCard">
+                <div class="summary-icon deep-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                        <polyline points="17 18 23 18 23 12"></polyline>
+                    </svg>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-label">Deep Drawdown (&gt;20%)</span>
+                    <span class="summary-value red" id="deepDrawdownValue">0</span>
+                </div>
+            </div>
+            <div class="summary-card" id="avgDrawdownCard">
+                <div class="summary-icon avg-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-label">Avg Drawdown</span>
+                    <span class="summary-value" id="avgDrawdownValue">0%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter & Sort Controls -->
+        <section class="controls-section">
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all" id="filterAll">All</button>
+                <button class="filter-btn" data-filter="tech" id="filterTech">Technology</button>
+                <button class="filter-btn" data-filter="health" id="filterHealth">Healthcare</button>
+                <button class="filter-btn" data-filter="mega" id="filterMega">Mega Cap</button>
+                <button class="filter-btn" data-filter="large" id="filterLarge">Large Cap</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn" data-filter="ath" id="filterAth">At ATH</button>
+                <button class="filter-btn" data-filter="near" id="filterNear">Near ATH</button>
+                <button class="filter-btn" data-filter="deep" id="filterDeep">Deep Drawdown</button>
+            </div>
+            <div class="sort-group">
+                <label class="sort-label">Sort by:</label>
+                <select id="sortSelect" class="sort-select">
+                    <option value="marketcap">Market Cap</option>
+                    <option value="drawdown">% From ATH</option>
+                    <option value="name">Name</option>
+                    <option value="price">Price</option>
+                </select>
+                <button class="sort-order-btn" id="sortOrderBtn" title="Toggle sort order">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12l7-7 7 7" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- Stock Table -->
+        <section class="table-section">
+            <div class="table-container">
+                <table class="stock-table" id="stockTable">
+                    <thead>
+                        <tr>
+                            <th class="col-rank">#</th>
+                            <th class="col-stock">Stock</th>
+                            <th class="col-sector">Sector</th>
+                            <th class="col-cap">Cap</th>
+                            <th class="col-mcap">Market Cap</th>
+                            <th class="col-price">Current Price</th>
+                            <th class="col-ath">All-Time High</th>
+                            <th class="col-drawdown">% From ATH</th>
+                            <th class="col-bar">Drawdown</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        <!-- Rows populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="no-results" id="noResults" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+                <p>No stocks match your search</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Live data from Yahoo Finance. For informational purposes only. Not financial advice.</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Fetching live data from Yahoo Finance...</p>
+            <p class="loading-subtext">Loading prices, market caps & ATH data</p>
+        </div>
+    </div>
+
+    <!-- Stock Detail Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="stockModal">
+            <button class="modal-close" id="modalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header">
+                <div class="modal-ticker" id="modalTicker"></div>
+                <div class="modal-name" id="modalName"></div>
+                <div class="modal-sector-badge" id="modalSector"></div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-metrics">
+                    <div class="metric-card current">
+                        <span class="metric-label">Current Price</span>
+                        <span class="metric-value" id="modalPrice"></span>
+                    </div>
+                    <div class="metric-card ath">
+                        <span class="metric-label">All-Time High</span>
+                        <span class="metric-value" id="modalAth"></span>
+                    </div>
+                    <div class="metric-card drawdown">
+                        <span class="metric-label">% From ATH</span>
+                        <span class="metric-value" id="modalDrawdown"></span>
+                    </div>
+                </div>
+                <div class="modal-viz">
+                    <div class="viz-label">Price vs ATH</div>
+                    <div class="viz-bar-container">
+                        <div class="viz-bar-track">
+                            <div class="viz-bar-fill" id="modalBarFill"></div>
+                            <div class="viz-bar-marker" id="modalBarMarker">
+                                <span class="marker-label" id="modalMarkerLabel"></span>
+                            </div>
+                        </div>
+                        <div class="viz-bar-labels">
+                            <span>$0</span>
+                            <span id="modalVizAth"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Market Cap</span>
+                        <span class="detail-value" id="modalMcap"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Category</span>
+                        <span class="detail-value" id="modalCategory"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">$ Below ATH</span>
+                        <span class="detail-value" id="modalDollarBelow"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Recovery Needed</span>
+                        <span class="detail-value" id="modalRecovery"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
