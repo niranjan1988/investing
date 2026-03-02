@@ -1,0 +1,222 @@
+{
+  "active": [
+    "NVDA",
+    "AAPL",
+    "GOOGL",
+    "AMZN",
+    "MSFT",
+    "META",
+    "TSLA",
+    "AVGO",
+    "PLTR",
+    "AMD",
+    "ADBE",
+    "INTC",
+    "IBM",
+    "TXN",
+    "PANW",
+    "NOW",
+    "SNPS",
+    "CDNS",
+    "APH",
+    "CRWD",
+    "SNOW",
+    "DDOG",
+    "MRVL",
+    "KLAC",
+    "LRCX",
+    "FTNT",
+    "ZS",
+    "OKTA",
+    "MDB",
+    "LLY",
+    "ABBV",
+    "MRK",
+    "ABT",
+    "VRTX",
+    "REGN",
+    "ORCL"
+  ],
+  "universe": [
+    {
+      "ticker": "NVDA",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "AAPL",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "GOOGL",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "AMZN",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "MSFT",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "META",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "TSLA",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "AVGO",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "ORCL",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "PLTR",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "AMD",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "ADBE",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "INTC",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "IBM",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "TXN",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "PANW",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "NOW",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "SNPS",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "CDNS",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "APH",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "CRWD",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "SNOW",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "DDOG",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "MRVL",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "KLAC",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "LRCX",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "FTNT",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "ZS",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "OKTA",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "MDB",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "LLY",
+      "sector": "Healthcare",
+      "cap": "mega"
+    },
+    {
+      "ticker": "ABBV",
+      "sector": "Healthcare",
+      "cap": "mega"
+    },
+    {
+      "ticker": "MRK",
+      "sector": "Healthcare",
+      "cap": "mega"
+    },
+    {
+      "ticker": "ABT",
+      "sector": "Healthcare",
+      "cap": "mega"
+    },
+    {
+      "ticker": "VRTX",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "REGN",
+      "sector": "Healthcare",
+      "cap": "large"
+    }
+  ]
+}

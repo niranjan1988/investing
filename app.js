@@ -73,6 +73,18 @@ const sortSelect = document.getElementById('sortSelect');
 const sortOrderBtn = document.getElementById('sortOrderBtn');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
+
+// Deactivated Modals
+const deactivatedModalOverlay = document.getElementById('deactivatedModalOverlay');
+const deactivatedModalClose = document.getElementById('deactivatedModalClose');
+const deactivatedBtn = document.getElementById('deactivatedBtn');
+const deactivateStockBtn = document.getElementById('deactivateStockBtn');
+const deactivatedList = document.getElementById('deactivatedList');
+const deactivatedEmpty = document.getElementById('deactivatedEmpty');
+
+let activeModalTicker = null;
+
+// Search & Filter states
 const noResults = document.getElementById('noResults');
 const tableContainer = document.querySelector('.table-container');
 const lastUpdatedEl = document.getElementById('lastUpdated');
@@ -379,6 +391,8 @@ function openModal(ticker) {
     const stock = stocksData.find(s => s.ticker === ticker);
     if (!stock) return;
 
+    activeModalTicker = ticker;
+
     const drawdown = calcDrawdown(stock.price, stock.ath);
     const dollarsBelow = stock.ath - stock.price;
     const recoveryNeeded = drawdown > 0 ? ((stock.ath / stock.price - 1) * 100) : 0;
@@ -519,6 +533,118 @@ if (refreshBtn) {
         fetchStockData();
     });
 }
+
+// ----------------------------------------------------
+// Deactivated Stocks Logic
+// ----------------------------------------------------
+
+async function toggleStockStatus(ticker, active) {
+    try {
+        const res = await fetch('/api/stocks/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticker, active })
+        });
+        const data = await res.json();
+        if (data.success) {
+            fetchStockData(); // Refresh main table
+            return true;
+        }
+    } catch (e) {
+        console.error('Failed to toggle stock', e);
+    }
+    return false;
+}
+
+if (deactivateStockBtn) {
+    deactivateStockBtn.addEventListener('click', async () => {
+        if (!activeModalTicker) return;
+        const success = await toggleStockStatus(activeModalTicker, false);
+        if (success) {
+            closeModal();
+        } else {
+            alert('Failed to deactivate stock.');
+        }
+    });
+}
+
+async function loadDeactivatedStocks() {
+    try {
+        const res = await fetch('/api/deactivated');
+        const data = await res.json();
+        const stocks = data.stocks || [];
+
+        deactivatedList.innerHTML = '';
+        if (stocks.length === 0) {
+            deactivatedList.style.display = 'none';
+            deactivatedEmpty.style.display = 'block';
+            return;
+        }
+
+        deactivatedList.style.display = 'flex';
+        deactivatedEmpty.style.display = 'none';
+
+        stocks.forEach(stock => {
+            const item = document.createElement('div');
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+            item.style.padding = '12px 16px';
+            item.style.background = 'var(--bg-tertiary)';
+            item.style.borderRadius = 'var(--radius-md)';
+
+            const info = document.createElement('div');
+            info.innerHTML = `<strong>${stock.ticker}</strong> <span style="color:var(--text-muted); font-size: 0.85em; margin-left:8px;">${stock.sector} - ${stock.cap}</span>`;
+
+            const btn = document.createElement('button');
+            btn.textContent = 'Reactivate';
+            btn.style.padding = '6px 12px';
+            btn.style.background = 'var(--green-500)';
+            btn.style.color = 'black';
+            btn.style.border = 'none';
+            btn.style.borderRadius = 'var(--radius-sm)';
+            btn.style.cursor = 'pointer';
+            btn.style.fontWeight = '600';
+            btn.style.fontSize = '0.8rem';
+
+            btn.onclick = async () => {
+                const success = await toggleStockStatus(stock.ticker, true);
+                if (success) {
+                    loadDeactivatedStocks(); // Reload list
+                }
+            };
+
+            item.appendChild(info);
+            item.appendChild(btn);
+            deactivatedList.appendChild(item);
+        });
+    } catch (e) {
+        console.error('Failed to load deactivated stocks', e);
+        deactivatedList.innerHTML = '<div style="color:var(--red-400)">Error loading list</div>';
+    }
+}
+
+if (deactivatedBtn) {
+    deactivatedBtn.addEventListener('click', () => {
+        loadDeactivatedStocks();
+        deactivatedModalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+}
+
+if (deactivatedModalClose) {
+    deactivatedModalClose.addEventListener('click', () => {
+        deactivatedModalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+}
+
+deactivatedModalOverlay.addEventListener('click', (e) => {
+    if (e.target === deactivatedModalOverlay) {
+        deactivatedModalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
 
 // ============================================
 // Theme Toggle

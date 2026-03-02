@@ -17,59 +17,31 @@ function fromYahooTicker(yahooTicker) {
     return map[yahooTicker] || yahooTicker;
 }
 
+const fs = require('fs');
+
 // ============================================
 // Stock Universe - Technology & Healthcare Only
 // ============================================
-const STOCK_UNIVERSE = [
-    // ── TECHNOLOGY ── MEGA CAP ──
+let IN_MEMORY_STOCKS = { active: [], universe: [] };
 
-    { ticker: "NVDA", sector: "Technology", cap: "mega" },
-    { ticker: "AAPL", sector: "Technology", cap: "mega" },
-    { ticker: "GOOGL", sector: "Technology", cap: "mega" },
-    { ticker: "AMZN", sector: "Technology", cap: "mega" },
-    { ticker: "MSFT", sector: "Technology", cap: "mega" },
-    { ticker: "META", sector: "Technology", cap: "mega" },
-    { ticker: "TSLA", sector: "Technology", cap: "mega" },
-    { ticker: "AVGO", sector: "Technology", cap: "mega" },
-    { ticker: "ORCL", sector: "Technology", cap: "mega" },
-    { ticker: "PLTR", sector: "Technology", cap: "mega" },
-    { ticker: "AMD", sector: "Technology", cap: "mega" },
-    { ticker: "ADBE", sector: "Technology", cap: "mega" },
-    { ticker: "INTC", sector: "Technology", cap: "mega" },
-    { ticker: "IBM", sector: "Technology", cap: "mega" },
+function loadStocks() {
+    try {
+        const data = fs.readFileSync(path.join(__dirname, 'stocks.json'), 'utf8');
+        IN_MEMORY_STOCKS = JSON.parse(data);
+    } catch (e) {
+        console.error('Failed to load stocks.json', e);
+    }
+}
+loadStocks();
 
-    // ── TECHNOLOGY ── LARGE CAP ──
+function saveStocks() {
+    try {
+        fs.writeFileSync(path.join(__dirname, 'stocks.json'), JSON.stringify(IN_MEMORY_STOCKS, null, 2), 'utf8');
+    } catch (e) {
+        console.error('Failed to save stocks.json', e);
+    }
+}
 
-    { ticker: "TXN", sector: "Technology", cap: "large" },
-    { ticker: "PANW", sector: "Technology", cap: "large" },
-    { ticker: "NOW", sector: "Technology", cap: "large" },
-    { ticker: "SNPS", sector: "Technology", cap: "large" },
-    { ticker: "CDNS", sector: "Technology", cap: "large" },
-    { ticker: "APH", sector: "Technology", cap: "large" },
-    { ticker: "CRWD", sector: "Technology", cap: "large" },
-    { ticker: "SNOW", sector: "Technology", cap: "large" },
-    { ticker: "DDOG", sector: "Technology", cap: "large" },
-    { ticker: "MRVL", sector: "Technology", cap: "large" },
-    { ticker: "KLAC", sector: "Technology", cap: "large" },
-    { ticker: "LRCX", sector: "Technology", cap: "large" },
-    { ticker: "FTNT", sector: "Technology", cap: "large" },
-    { ticker: "ZS", sector: "Technology", cap: "large" },
-    { ticker: "OKTA", sector: "Technology", cap: "large" },
-    { ticker: "MDB", sector: "Technology", cap: "large" },
-
-    // ── HEALTHCARE / HEALTH TECH ── MEGA CAP ──
-
-    { ticker: "LLY", sector: "Healthcare", cap: "mega" },
-    { ticker: "ABBV", sector: "Healthcare", cap: "mega" },
-    { ticker: "MRK", sector: "Healthcare", cap: "mega" },
-    { ticker: "ABT", sector: "Healthcare", cap: "mega" },
-
-
-    // ── HEALTHCARE / HEALTH TECH ── LARGE CAP ──   
-
-    { ticker: "VRTX", sector: "Healthcare", cap: "large" },
-    { ticker: "REGN", sector: "Healthcare", cap: "large" },
-];
 
 // ============================================
 // Yahoo Finance Auth (Crumb + Cookie)
@@ -290,7 +262,9 @@ app.get('/api/stocks', async (req, res) => {
 
         console.log('[API] Fetching fresh stock data...');
         const startTime = Date.now();
-        const tickers = STOCK_UNIVERSE.map(s => s.ticker);
+        const activeTickers = new Set(IN_MEMORY_STOCKS.active);
+        const ACTIVE_STOCK_UNIVERSE = IN_MEMORY_STOCKS.universe.filter(s => activeTickers.has(s.ticker));
+        const tickers = ACTIVE_STOCK_UNIVERSE.map(s => s.ticker);
 
         // Fetch quotes (with market cap) and ATHs in parallel
         const [quoteMap, athMap] = await Promise.all([
@@ -299,7 +273,7 @@ app.get('/api/stocks', async (req, res) => {
         ]);
 
         // Combine data
-        const stocks = STOCK_UNIVERSE.map(config => {
+        const stocks = ACTIVE_STOCK_UNIVERSE.map(config => {
             const quote = quoteMap[config.ticker] || {};
             const chartData = athMap[config.ticker] || {};
             const chartATH = chartData.value;
@@ -339,7 +313,7 @@ app.get('/api/stocks', async (req, res) => {
         }).filter(Boolean);
 
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        console.log(`[API] Fetched ${stocks.length}/${STOCK_UNIVERSE.length} stocks in ${elapsed}s`);
+        console.log(`[API] Fetched ${stocks.length}/${ACTIVE_STOCK_UNIVERSE.length} stocks in ${elapsed}s`);
 
         const responseData = {
             stocks,
@@ -386,10 +360,47 @@ app.get('/api/news/:ticker', async (req, res) => {
 // Serve Static Files & Start
 // ============================================
 app.use(express.static(path.join(__dirname)));
+app.use(express.json());
+
+// API route to change the active state of a stock
+app.post('/api/stocks/toggle', (req, res) => {
+    try {
+        const { ticker, active } = req.body;
+        if (!ticker) {
+            return res.status(400).json({ error: 'Ticker is required' });
+        }
+
+        let newActive = new Set(IN_MEMORY_STOCKS.active);
+        if (active) {
+            newActive.add(ticker);
+        } else {
+            newActive.delete(ticker);
+        }
+
+        IN_MEMORY_STOCKS.active = Array.from(newActive);
+        saveStocks();
+        fullDataCache = null; // invalidate cache
+
+        res.json({ success: true, active: IN_MEMORY_STOCKS.active });
+    } catch (err) {
+        console.error('[API] Error in toggle:', err.message);
+        res.status(500).json({ error: 'Failed to toggle stock' });
+    }
+});
+
+app.get('/api/deactivated', (req, res) => {
+    try {
+        const activeTickers = new Set(IN_MEMORY_STOCKS.active);
+        const deactivated = IN_MEMORY_STOCKS.universe.filter(s => !activeTickers.has(s.ticker));
+        res.json({ stocks: deactivated });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed' });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`\n🚀 StockPulse server running at http://localhost:${PORT}\n`);
-    console.log(`   Stock universe: ${STOCK_UNIVERSE.length} tickers`);
+    console.log(`   Stock universe: ${IN_MEMORY_STOCKS.universe.length} total tickers, ${IN_MEMORY_STOCKS.active.length} active`);
     console.log(`   Auth: Yahoo crumb+cookie (auto-refreshing)`);
     console.log(`   ATH source: v8 Chart API (max range monthly)`);
     console.log(`   Quotes: v7 Quote API (price + market cap)\n`);

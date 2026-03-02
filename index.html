@@ -72,6 +72,13 @@
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
+                <button class="theme-toggle" id="deactivatedBtn" title="View deactivated stocks"
+                    aria-label="View deactivated">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <line x1="2" y1="2" x2="22" y2="22"></line>
+                    </svg>
+                </button>
                 <div class="last-updated" id="lastUpdated">
                     Updated: Feb 2026
                 </div>
@@ -242,6 +249,10 @@
                 <div class="modal-ticker" id="modalTicker"></div>
                 <div class="modal-name" id="modalName"></div>
                 <div class="modal-sector-badge" id="modalSector"></div>
+                <button class="deactivate-btn" id="deactivateStockBtn"
+                    style="margin-left: auto; padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--red-400); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-family: var(--font-family); transition: all 0.2s;">
+                    Deactivate
+                </button>
             </div>
             <div class="modal-body">
                 <div class="modal-metrics">
@@ -308,6 +319,31 @@
                     <div id="modalNewsList" class="news-list">
                         <!-- News items injected here -->
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deactivated Stocks Modal -->
+    <div class="modal-overlay" id="deactivatedModalOverlay">
+        <div class="modal" id="deactivatedModal">
+            <button class="modal-close" id="deactivatedModalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header" style="margin-bottom: 20px;">
+                <div class="modal-name" style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">
+                    Deactivated Stocks</div>
+            </div>
+            <div class="modal-body">
+                <div id="deactivatedList" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Injected by JS -->
+                </div>
+                <div id="deactivatedEmpty"
+                    style="display: none; padding: 20px; text-align: center; color: var(--text-muted);">
+                    No deactivated stocks.
                 </div>
             </div>
         </div>
