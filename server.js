@@ -169,6 +169,7 @@ async function fetchBatchQuotes(tickers) {
             mcap: (q.marketCap ?? 0) / 1e9, // Convert to billions
             name: q.longName || q.shortName || ourTicker,
             fiftyTwoWeekHigh: q.fiftyTwoWeekHigh ?? 0,
+            previousClose: q.regularMarketPreviousClose ?? 0,
         };
     }
     return quoteMap;
@@ -287,6 +288,7 @@ app.get('/api/stocks', async (req, res) => {
                 sector: config.sector,
                 cap: config.cap,
                 price: Math.round(price * 100) / 100,
+                previousClose: Math.round((quote.previousClose || 0) * 100) / 100,
                 mcap: Math.round(quote.mcap * 10) / 10 || 0,
                 ath: Math.round(finalATH * 100) / 100,
             };
@@ -309,6 +311,30 @@ app.get('/api/stocks', async (req, res) => {
     } catch (err) {
         console.error('[API] Error:', err.message);
         res.status(500).json({ error: 'Failed to fetch stock data', message: err.message });
+    }
+});
+
+// ============================================
+// News API Endpoint
+// ============================================
+app.get('/api/news/:ticker', async (req, res) => {
+    try {
+        const ticker = req.params.ticker;
+        const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${ticker}&newsCount=5`;
+        const response = await fetch(url, {
+            headers: { 'User-Agent': YAHOO_UA }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Yahoo news API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        const news = data.news || [];
+        res.json({ news });
+    } catch (err) {
+        console.error(`[API] News Error for ${req.params.ticker}:`, err.message);
+        res.status(500).json({ error: 'Failed to fetch news', message: err.message });
     }
 });
 

@@ -225,6 +225,10 @@ function renderTable() {
         const avatarColors = getAvatarColor(stock.sector);
         const barWidth = Math.min(drawdown, 60) / 60 * 100; // cap visual at 60%
 
+        let priceChangeClass = '';
+        if (stock.price > stock.previousClose) priceChangeClass = 'price-up';
+        else if (stock.price < stock.previousClose) priceChangeClass = 'price-down';
+
         return `
             <tr data-ticker="${stock.ticker}" onclick="openModal('${stock.ticker}')">
                 <td class="col-rank"><span class="rank-num">${index + 1}</span></td>
@@ -242,7 +246,12 @@ function renderTable() {
                 <td class="col-sector"><span class="sector-badge">${stock.sector}</span></td>
                 <td class="col-cap"><span class="cap-badge cap-${stock.cap}">${stock.cap}</span></td>
                 <td class="col-mcap"><span class="price-cell">${formatMarketCap(stock.mcap)}</span></td>
-                <td class="col-price"><span class="price-cell">${formatPrice(stock.price)}</span></td>
+                <td class="col-price">
+                    <div class="price-container">
+                        <span class="price-cell ${priceChangeClass}">${formatPrice(stock.price)}</span>
+                        <span class="prev-close-cell">Close: ${formatPrice(stock.previousClose)}</span>
+                    </div>
+                </td>
                 <td class="col-ath"><span class="ath-cell">${formatPrice(stock.ath)}</span></td>
                 <td class="col-drawdown">
                     <span class="drawdown-cell ${drawdownClass}">
@@ -351,10 +360,33 @@ function closeModal() {
 // ============================================
 
 // Search
+function updateClearButtonVisibility() {
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (clearBtn) {
+        if (searchQuery) {
+            clearBtn.classList.add('visible');
+        } else {
+            clearBtn.classList.remove('visible');
+        }
+    }
+}
+
 searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value;
+    updateClearButtonVisibility();
     renderTable();
 });
+
+const clearSearchBtn = document.getElementById('clearSearchBtn');
+if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchQuery = '';
+        updateClearButtonVisibility();
+        searchInput.focus();
+        renderTable();
+    });
+}
 
 // Keyboard shortcut (Cmd+K / Ctrl+K)
 document.addEventListener('keydown', (e) => {
@@ -369,6 +401,7 @@ document.addEventListener('keydown', (e) => {
             searchInput.blur();
             searchInput.value = '';
             searchQuery = '';
+            updateClearButtonVisibility();
             renderTable();
         }
     }

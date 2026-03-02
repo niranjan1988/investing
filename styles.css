@@ -317,7 +317,7 @@ body::before {
 
 #searchInput {
     width: 100%;
-    padding: 10px 50px 10px 42px;
+    padding: 10px 84px 10px 42px;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-full);
@@ -349,6 +349,39 @@ body::before {
     color: var(--text-dim);
     font-family: var(--font-family);
     pointer-events: none;
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 48px;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all var(--duration-fast);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.clear-search-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.clear-search-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.clear-search-btn svg {
+    width: 14px;
+    height: 14px;
 }
 
 /* Header Right */
@@ -841,12 +874,35 @@ body::before {
     border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
+.price-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
 .price-cell {
     text-align: right;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     font-family: var(--font-family);
     letter-spacing: -0.01em;
+}
+
+.price-up {
+    color: var(--green-400);
+}
+
+.price-down {
+    color: var(--red-400);
+}
+
+.prev-close-cell {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-family);
+    letter-spacing: 0.02em;
 }
 
 .ath-cell {
