@@ -801,17 +801,18 @@ if (addStockForm) {
 
 function initTheme() {
     const saved = localStorage.getItem('stockpulse-theme');
-    if (saved === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
+    if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
     } else {
-        document.documentElement.removeAttribute('data-theme');
+        // Default to light
+        document.documentElement.setAttribute('data-theme', 'light');
     }
 }
 
 function toggleTheme() {
-    const isLight = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isLight) {
-        document.documentElement.removeAttribute('data-theme');
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('stockpulse-theme', 'dark');
     } else {
         document.documentElement.setAttribute('data-theme', 'light');
