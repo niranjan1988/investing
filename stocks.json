@@ -36,7 +36,10 @@
     "ADMA",
     "MEDP",
     "APPF",
-    "DUOL"
+    "DUOL",
+    "COIN",
+    "HOOD",
+    "MSTR"
   ],
   "universe": [
     {
@@ -276,6 +279,21 @@
     },
     {
       "ticker": "DUOL",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "COIN",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "HOOD",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "MSTR",
       "sector": "Technology",
       "cap": "large"
     }

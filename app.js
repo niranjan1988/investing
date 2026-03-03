@@ -265,6 +265,8 @@ function renderTable() {
         else if (stock.price < stock.previousClose) priceChangeClass = 'price-down';
 
         const changeStr = (changePct > 0 ? '+' : '') + changePct.toFixed(2) + '%';
+        const isShortlisted = shortlistedStocks.includes(stock.ticker);
+        const tickerDecoration = isShortlisted ? '<span style="color: var(--yellow-400); margin-right: 4px;">★</span>' : '';
 
         return `
             <tr data-ticker="${stock.ticker}" onclick="openModal('${stock.ticker}')">
@@ -275,7 +277,7 @@ function renderTable() {
                             ${stock.ticker.substring(0, 3)}
                         </div>
                         <div class="stock-details">
-                            <span class="stock-ticker">${stock.ticker}</span>
+                            <span class="stock-ticker">${tickerDecoration}${stock.ticker}</span>
                             <div class="stock-name-row">
                                 <span class="stock-name">${stock.name}</span>
                                 <a href="https://www.tradingview.com/chart/?symbol=${stock.ticker}" target="_blank" class="tv-btn" onclick="event.stopPropagation()" aria-label="Open in TradingView" title="Open in TradingView">
