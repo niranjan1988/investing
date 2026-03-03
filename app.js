@@ -63,6 +63,7 @@ let currentFilter = 'all';
 let currentSort = 'marketcap';
 let sortAscending = false;
 let searchQuery = '';
+let shortlistedStocks = JSON.parse(localStorage.getItem('shortlistedStocks') || '[]');
 
 // ============================================
 // DOM Elements
@@ -79,6 +80,7 @@ const deactivatedModalOverlay = document.getElementById('deactivatedModalOverlay
 const deactivatedModalClose = document.getElementById('deactivatedModalClose');
 const deactivatedBtn = document.getElementById('deactivatedBtn');
 const deactivateStockBtn = document.getElementById('deactivateStockBtn');
+const shortlistStockBtn = document.getElementById('shortlistStockBtn');
 const deactivatedList = document.getElementById('deactivatedList');
 const deactivatedEmpty = document.getElementById('deactivatedEmpty');
 
@@ -200,6 +202,9 @@ function getFilteredAndSortedStocks() {
         case 'deep':
             stocks = stocks.filter(s => s.drawdown > 20);
             break;
+        case 'shortlisted':
+            stocks = stocks.filter(s => shortlistedStocks.includes(s.ticker));
+            break;
     }
 
     // Apply sort
@@ -251,8 +256,15 @@ function renderTable() {
         const barWidth = Math.min(drawdown, 60) / 60 * 100; // cap visual at 60%
 
         let priceChangeClass = '';
+        let changePct = 0;
+        if (stock.previousClose > 0) {
+            changePct = ((stock.price - stock.previousClose) / stock.previousClose) * 100;
+        }
+
         if (stock.price > stock.previousClose) priceChangeClass = 'price-up';
         else if (stock.price < stock.previousClose) priceChangeClass = 'price-down';
+
+        const changeStr = (changePct > 0 ? '+' : '') + changePct.toFixed(2) + '%';
 
         return `
             <tr data-ticker="${stock.ticker}" onclick="openModal('${stock.ticker}')">
@@ -281,7 +293,7 @@ function renderTable() {
                 <td class="col-mcap"><span class="price-cell">${formatMarketCap(stock.mcap)}</span></td>
                 <td class="col-price">
                     <div class="price-container">
-                        <span class="price-cell ${priceChangeClass}">${formatPrice(stock.price)}</span>
+                        <span class="price-cell ${priceChangeClass}">${formatPrice(stock.price)} <span style="font-size: 0.75em; opacity: 0.9; margin-left: 4px;">${changeStr}</span></span>
                         <span class="prev-close-cell">Close: ${formatPrice(stock.previousClose)}</span>
                     </div>
                 </td>
@@ -408,6 +420,25 @@ function openModal(ticker) {
     document.getElementById('modalName').textContent = stock.name;
     document.getElementById('modalSector').textContent = stock.sector;
     document.getElementById('modalPrice').textContent = formatPrice(stock.price);
+
+    const isShortlisted = shortlistedStocks.includes(ticker);
+    if (shortlistStockBtn) {
+        shortlistStockBtn.textContent = isShortlisted ? 'Remove from Shortlist' : 'Shortlist';
+        shortlistStockBtn.style.background = isShortlisted ? 'var(--accent)' : 'var(--bg-tertiary)';
+        shortlistStockBtn.style.color = isShortlisted ? '#fff' : 'var(--accent)';
+    }
+
+    let modalChangePct = 0;
+    if (stock.previousClose > 0) {
+        modalChangePct = ((stock.price - stock.previousClose) / stock.previousClose) * 100;
+    }
+    const modalChangeStr = (modalChangePct > 0 ? '+' : '') + modalChangePct.toFixed(2) + '%';
+    const modalPriceChangeEl = document.getElementById('modalPriceChange');
+    if (modalPriceChangeEl) {
+        modalPriceChangeEl.textContent = modalChangeStr;
+        modalPriceChangeEl.className = modalChangePct > 0 ? 'price-up' : (modalChangePct < 0 ? 'price-down' : '');
+    }
+
     document.getElementById('modalAth').textContent = formatPrice(stock.ath);
 
     const drawdownEl = document.getElementById('modalDrawdown');
@@ -591,6 +622,30 @@ if (deactivateStockBtn) {
             deactivateStockBtn.style.opacity = '1';
         } else {
             alert('Failed to deactivate stock.');
+        }
+    });
+}
+
+if (shortlistStockBtn) {
+    shortlistStockBtn.addEventListener('click', () => {
+        if (!activeModalTicker) return;
+        const isShortlisted = shortlistedStocks.includes(activeModalTicker);
+        if (isShortlisted) {
+            shortlistedStocks = shortlistedStocks.filter(t => t !== activeModalTicker);
+        } else {
+            shortlistedStocks.push(activeModalTicker);
+        }
+        localStorage.setItem('shortlistedStocks', JSON.stringify(shortlistedStocks));
+
+        // Update button visual
+        const currentlyShortlisted = shortlistedStocks.includes(activeModalTicker);
+        shortlistStockBtn.textContent = currentlyShortlisted ? 'Remove from Shortlist' : 'Shortlist';
+        shortlistStockBtn.style.background = currentlyShortlisted ? 'var(--accent)' : 'var(--bg-tertiary)';
+        shortlistStockBtn.style.color = currentlyShortlisted ? '#fff' : 'var(--accent)';
+
+        // Refresh table if needed
+        if (currentFilter === 'shortlisted') {
+            renderTable();
         }
     });
 }

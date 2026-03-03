@@ -27,7 +27,18 @@
     "ABBV",
     "ABT",
     "VRTX",
-    "NET"
+    "NET",
+    "TSM",
+    "MELI",
+    "APP",
+    "ASML",
+    "ANET",
+    "MPWR",
+    "VRT",
+    "ADMA",
+    "MEDP",
+    "APPF",
+    "DUOL"
   ],
   "universe": [
     {
@@ -212,6 +223,61 @@
     },
     {
       "ticker": "NET",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "TSM",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "MELI",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "APP",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "ASML",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "ANET",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "MPWR",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "VRT",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "ADMA",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "MEDP",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "APPF",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "DUOL",
       "sector": "Technology",
       "cap": "large"
     }

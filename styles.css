@@ -241,6 +241,10 @@ body::before {
     border-bottom: 1px solid var(--border-color);
     margin-bottom: var(--space-xl);
     gap: var(--space-lg);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--bg-primary);
 }
 
 .header-left {

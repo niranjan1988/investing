@@ -164,6 +164,7 @@
                 <button class="filter-btn" data-filter="health" id="filterHealth">Healthcare</button>
                 <button class="filter-btn" data-filter="mega" id="filterMega">Mega Cap</button>
                 <button class="filter-btn" data-filter="large" id="filterLarge">Large Cap</button>
+                <button class="filter-btn" data-filter="shortlisted" id="filterShortlisted">Shortlisted</button>
             </div>
             <div class="filter-group">
                 <button class="filter-btn" data-filter="ath" id="filterAth">At ATH</button>
@@ -255,8 +256,12 @@
                 <div class="modal-ticker" id="modalTicker"></div>
                 <div class="modal-name" id="modalName"></div>
                 <div class="modal-sector-badge" id="modalSector"></div>
+                <button class="shortlist-btn" id="shortlistStockBtn"
+                    style="margin-left: auto; padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--accent); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-family: var(--font-family); transition: all 0.2s;">
+                    Shortlist
+                </button>
                 <button class="deactivate-btn" id="deactivateStockBtn"
-                    style="margin-left: auto; padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--red-400); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-family: var(--font-family); transition: all 0.2s;">
+                    style="margin-left: 10px; padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--red-400); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-family: var(--font-family); transition: all 0.2s;">
                     Deactivate
                 </button>
             </div>
@@ -264,7 +269,10 @@
                 <div class="modal-metrics">
                     <div class="metric-card current">
                         <span class="metric-label">Current Price</span>
-                        <span class="metric-value" id="modalPrice"></span>
+                        <div style="display: flex; align-items: baseline; gap: 8px;">
+                            <span class="metric-value" id="modalPrice"></span>
+                            <span id="modalPriceChange" style="font-size: 0.9em; font-weight: 600;"></span>
+                        </div>
                     </div>
                     <div class="metric-card ath">
                         <span class="metric-label">All-Time High</span>
