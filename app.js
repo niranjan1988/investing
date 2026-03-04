@@ -63,7 +63,7 @@ let currentFilter = 'all';
 let currentSort = 'marketcap';
 let sortAscending = false;
 let searchQuery = '';
-let shortlistedStocks = JSON.parse(localStorage.getItem('shortlistedStocks') || '[]');
+let shortlistedStocks = [];
 
 // ============================================
 // DOM Elements
@@ -101,6 +101,21 @@ const lastUpdatedEl = document.getElementById('lastUpdated');
 // ============================================
 // Data Fetching
 // ============================================
+
+async function fetchShortlistedStocks() {
+    try {
+        const res = await fetch('/api/shortlisted');
+        if (res.ok) {
+            const data = await res.json();
+            shortlistedStocks = data.shortlisted || [];
+            if (currentFilter === 'shortlisted') {
+                renderTable();
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load shortlisted stocks', e);
+    }
+}
 
 async function fetchStockData(silent = false) {
     if (!silent) showLoading(true);
@@ -629,15 +644,16 @@ if (deactivateStockBtn) {
 }
 
 if (shortlistStockBtn) {
-    shortlistStockBtn.addEventListener('click', () => {
+    shortlistStockBtn.addEventListener('click', async () => {
         if (!activeModalTicker) return;
-        const isShortlisted = shortlistedStocks.includes(activeModalTicker);
-        if (isShortlisted) {
+        const isCurrentlyShortlisted = shortlistedStocks.includes(activeModalTicker);
+
+        // Optimistic UI update
+        if (isCurrentlyShortlisted) {
             shortlistedStocks = shortlistedStocks.filter(t => t !== activeModalTicker);
         } else {
             shortlistedStocks.push(activeModalTicker);
         }
-        localStorage.setItem('shortlistedStocks', JSON.stringify(shortlistedStocks));
 
         // Update button visual
         const currentlyShortlisted = shortlistedStocks.includes(activeModalTicker);
@@ -648,6 +664,23 @@ if (shortlistStockBtn) {
         // Refresh table if needed
         if (currentFilter === 'shortlisted') {
             renderTable();
+        }
+
+        try {
+            const res = await fetch('/api/shortlisted/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticker: activeModalTicker, shortlisted: !isCurrentlyShortlisted })
+            });
+            const data = await res.json();
+            if (data.success) {
+                shortlistedStocks = data.shortlisted;
+                if (currentFilter === 'shortlisted' || currentlyShortlisted !== shortlistedStocks.includes(activeModalTicker)) {
+                    renderTable();
+                }
+            }
+        } catch (e) {
+            console.error('Failed to toggle shortlist status', e);
         }
     });
 }
@@ -834,5 +867,6 @@ if (themeToggle) {
 // Initialize
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    fetchShortlistedStocks();
     fetchStockData();
 });

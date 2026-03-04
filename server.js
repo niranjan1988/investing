@@ -22,12 +22,15 @@ const fs = require('fs');
 // ============================================
 // Stock Universe - Technology & Healthcare Only
 // ============================================
-let IN_MEMORY_STOCKS = { active: [], universe: [] };
+let IN_MEMORY_STOCKS = { active: [], universe: [], shortlisted: [] };
 
 function loadStocks() {
     try {
         const data = fs.readFileSync(path.join(__dirname, 'stocks.json'), 'utf8');
         IN_MEMORY_STOCKS = JSON.parse(data);
+        if (!IN_MEMORY_STOCKS.shortlisted) {
+            IN_MEMORY_STOCKS.shortlisted = [];
+        }
     } catch (e) {
         console.error('Failed to load stocks.json', e);
     }
@@ -432,6 +435,40 @@ app.get('/api/deactivated', (req, res) => {
         res.json({ stocks: deactivated });
     } catch (err) {
         res.status(500).json({ error: 'Failed' });
+    }
+});
+
+// API route to get shortlisted stocks
+app.get('/api/shortlisted', (req, res) => {
+    try {
+        res.json({ shortlisted: IN_MEMORY_STOCKS.shortlisted || [] });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed' });
+    }
+});
+
+// API route to toggle shortlist status
+app.post('/api/shortlisted/toggle', (req, res) => {
+    try {
+        const { ticker, shortlisted } = req.body;
+        if (!ticker) {
+            return res.status(400).json({ error: 'Ticker is required' });
+        }
+
+        let newShortlisted = new Set(IN_MEMORY_STOCKS.shortlisted || []);
+        if (shortlisted) {
+            newShortlisted.add(ticker);
+        } else {
+            newShortlisted.delete(ticker);
+        }
+
+        IN_MEMORY_STOCKS.shortlisted = Array.from(newShortlisted);
+        saveStocks();
+
+        res.json({ success: true, shortlisted: IN_MEMORY_STOCKS.shortlisted });
+    } catch (err) {
+        console.error('[API] Error in shortlist toggle:', err.message);
+        res.status(500).json({ error: 'Failed to toggle shortlist' });
     }
 });
 
