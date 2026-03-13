@@ -685,64 +685,97 @@ if (shortlistStockBtn) {
     });
 }
 
+let allDeactivatedStocks = [];
+let deactivatedSearchQuery = '';
+
 async function loadDeactivatedStocks() {
     try {
         const res = await fetch('/api/deactivated');
         const data = await res.json();
-        const stocks = data.stocks || [];
-
-        deactivatedList.innerHTML = '';
-        if (stocks.length === 0) {
-            deactivatedList.style.display = 'none';
-            deactivatedEmpty.style.display = 'block';
-            return;
-        }
-
-        deactivatedList.style.display = 'flex';
-        deactivatedEmpty.style.display = 'none';
-
-        stocks.forEach(stock => {
-            const item = document.createElement('div');
-            item.style.display = 'flex';
-            item.style.justifyContent = 'space-between';
-            item.style.alignItems = 'center';
-            item.style.padding = '12px 16px';
-            item.style.background = 'var(--bg-tertiary)';
-            item.style.borderRadius = 'var(--radius-md)';
-
-            const info = document.createElement('div');
-            info.innerHTML = `<strong>${stock.ticker}</strong> <span style="color:var(--text-muted); font-size: 0.85em; margin-left:8px;">${stock.sector} - ${stock.cap}</span>`;
-
-            const btn = document.createElement('button');
-            btn.textContent = 'Reactivate';
-            btn.style.padding = '6px 12px';
-            btn.style.background = 'var(--green-500)';
-            btn.style.color = 'black';
-            btn.style.border = 'none';
-            btn.style.borderRadius = 'var(--radius-sm)';
-            btn.style.cursor = 'pointer';
-            btn.style.fontWeight = '600';
-            btn.style.fontSize = '0.8rem';
-
-            btn.onclick = async () => {
-                const success = await toggleStockStatus(stock.ticker, true, btn);
-                if (success) {
-                    loadDeactivatedStocks(); // Reload list
-                }
-            };
-
-            item.appendChild(info);
-            item.appendChild(btn);
-            deactivatedList.appendChild(item);
-        });
+        allDeactivatedStocks = data.stocks || [];
+        renderDeactivatedStocks();
     } catch (e) {
         console.error('Failed to load deactivated stocks', e);
         deactivatedList.innerHTML = '<div style="color:var(--red-400)">Error loading list</div>';
     }
 }
 
+function renderDeactivatedStocks() {
+    deactivatedList.innerHTML = '';
+    
+    let stocksToRender = allDeactivatedStocks;
+    if (deactivatedSearchQuery) {
+        const q = deactivatedSearchQuery.toLowerCase();
+        stocksToRender = stocksToRender.filter(s => 
+            s.ticker.toLowerCase().includes(q) || 
+            s.sector.toLowerCase().includes(q)
+        );
+    }
+
+    if (stocksToRender.length === 0) {
+        if (allDeactivatedStocks.length === 0) {
+            deactivatedEmpty.textContent = 'No deactivated stocks.';
+        } else {
+            deactivatedEmpty.textContent = 'No stocks match your search.';
+        }
+        deactivatedList.style.display = 'none';
+        deactivatedEmpty.style.display = 'block';
+        return;
+    }
+
+    deactivatedList.style.display = 'flex';
+    deactivatedEmpty.style.display = 'none';
+
+    stocksToRender.forEach(stock => {
+        const item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+        item.style.padding = '12px 16px';
+        item.style.background = 'var(--bg-tertiary)';
+        item.style.borderRadius = 'var(--radius-md)';
+
+        const info = document.createElement('div');
+        info.innerHTML = `<strong>${stock.ticker}</strong> <span style="color:var(--text-muted); font-size: 0.85em; margin-left:8px;">${stock.sector} - ${stock.cap}</span>`;
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Reactivate';
+        btn.style.padding = '6px 12px';
+        btn.style.background = 'var(--green-500)';
+        btn.style.color = 'black';
+        btn.style.border = 'none';
+        btn.style.borderRadius = 'var(--radius-sm)';
+        btn.style.cursor = 'pointer';
+        btn.style.fontWeight = '600';
+        btn.style.fontSize = '0.8rem';
+
+        btn.onclick = async () => {
+            const success = await toggleStockStatus(stock.ticker, true, btn);
+            if (success) {
+                loadDeactivatedStocks(); // Reload list
+            }
+        };
+
+        item.appendChild(info);
+        item.appendChild(btn);
+        deactivatedList.appendChild(item);
+    });
+}
+
+const deactivatedSearchInput = document.getElementById('deactivatedSearchInput');
+if (deactivatedSearchInput) {
+    deactivatedSearchInput.addEventListener('input', (e) => {
+        deactivatedSearchQuery = e.target.value;
+        renderDeactivatedStocks();
+    });
+}
+
 if (deactivatedBtn) {
     deactivatedBtn.addEventListener('click', () => {
+        if (deactivatedSearchInput) {
+            deactivatedSearchInput.value = '';
+            deactivatedSearchQuery = '';
+        }
         loadDeactivatedStocks();
         deactivatedModalOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
