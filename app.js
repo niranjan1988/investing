@@ -537,6 +537,12 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         searchInput.focus();
     }
+    
+    // Alt+A to open Add Stock modal
+    if (e.altKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        if (addStockBtn) addStockBtn.click();
+    }
     if (e.key === 'Escape') {
         if (modalOverlay.classList.contains('active')) {
             closeModal();
@@ -815,12 +821,13 @@ if (addStockModalClose) {
     });
 }
 
-addStockModalOverlay.addEventListener('click', (e) => {
-    if (e.target === addStockModalOverlay) {
-        addStockModalOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-});
+// Modal no longer closes when clicking outside overlay
+// addStockModalOverlay.addEventListener('click', (e) => {
+//     if (e.target === addStockModalOverlay) {
+//         addStockModalOverlay.classList.remove('active');
+//         document.body.style.overflow = '';
+//     }
+// });
 
 if (addStockForm) {
     addStockForm.addEventListener('submit', async (e) => {

@@ -39,7 +39,23 @@
     "DUOL",
     "COIN",
     "HOOD",
-    "MSTR"
+    "MSTR",
+    "RKLB",
+    "MU",
+    "NFLX",
+    "ISRG",
+    "NVO",
+    "INTU",
+    "ADSK",
+    "UI",
+    "IDXX",
+    "TER",
+    "GRMN",
+    "ARGX",
+    "DXCM",
+    "UTHR",
+    "FSLR",
+    "CRDO"
   ],
   "universe": [
     {
@@ -294,6 +310,86 @@
     },
     {
       "ticker": "MSTR",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "RKLB",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "MU",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "NFLX",
+      "sector": "Technology",
+      "cap": "mega"
+    },
+    {
+      "ticker": "ISRG",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "NVO",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "INTU",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "ADSK",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "UI",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "IDXX",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "TER",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "GRMN",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "ARGX",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "DXCM",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "UTHR",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "FSLR",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "CRDO",
       "sector": "Technology",
       "cap": "large"
     }
