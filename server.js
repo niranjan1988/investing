@@ -472,6 +472,120 @@ app.post('/api/shortlisted/toggle', (req, res) => {
     }
 });
 
+// ============================================
+// SIP Calculator Endpoint
+// ============================================
+function calculateSIPCagr(totalMonths, finalValue, monthlyInvestment = 100) {
+    if (finalValue <= 0 || totalMonths <= 0) return 0;
+
+    let low = -0.9999;
+    let high = 2.0;
+    let r = 0;
+    let guess = 0;
+
+    for (let i = 0; i < 100; i++) {
+        r = (low + high) / 2;
+        if (r === 0) {
+            guess = monthlyInvestment * totalMonths;
+        } else {
+            // Future value of an annuity due formula
+            guess = monthlyInvestment * ((1 + r) * (Math.pow(1 + r, totalMonths) - 1)) / r;
+        }
+
+        if (guess > finalValue) {
+            high = r;
+        } else {
+            low = r;
+        }
+    }
+
+    const annualRate = Math.pow(1 + r, 12) - 1;
+    return annualRate * 100;
+}
+
+app.get('/api/sip/:ticker', async (req, res) => {
+    try {
+        const ticker = req.params.ticker;
+        const years = parseInt(req.query.years) || 5;
+        const totalMonths = years * 12;
+
+        const yahooTicker = toYahooTicker(ticker);
+        const url = `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=10y&interval=1mo`;
+
+        const response = await fetch(url, { headers: { 'User-Agent': YAHOO_UA } });
+        if (!response.ok) throw new Error('Failed to fetch chart data');
+
+        const data = await response.json();
+        const result = data?.chart?.result?.[0];
+        if (!result) throw new Error('No chart data found');
+
+        const closes = result.indicators?.quote?.[0]?.close || [];
+        const opens = result.indicators?.quote?.[0]?.open || [];
+        const timestamps = result.timestamp || [];
+        const validData = [];
+        let lastMonthStr = '';
+        
+        for (let i = 0; i < closes.length; i++) {
+            if (closes[i] != null && !isNaN(closes[i]) && timestamps[i]) {
+                const openPrice = (opens[i] != null && !isNaN(opens[i])) ? opens[i] : closes[i];
+                const d = new Date(timestamps[i] * 1000);
+                const monthStr = `${d.getFullYear()}-${d.getMonth()}`;
+                
+                if (validData.length > 0 && lastMonthStr === monthStr) {
+                    // Update the close to the latest, but keep the original open price as the entry point
+                    validData[validData.length - 1].close = closes[i];
+                } else {
+                    validData.push({ time: timestamps[i], close: closes[i], open: openPrice });
+                    lastMonthStr = monthStr;
+                }
+            }
+        }
+
+        // Require at least `totalMonths` of data
+        if (validData.length < totalMonths) {
+            return res.status(400).json({
+                error: `Not enough historical data for ${years} years. Available: ${Math.floor(validData.length / 12)} years.`
+            });
+        }
+
+        const sipData = validData.slice(-totalMonths);
+        const currentPrice = validData[validData.length - 1].close;
+
+        let shares = 0;
+        let invested = 0;
+        const monthlyInvestment = 100;
+        const installments = [];
+
+        for (let i = 0; i < totalMonths; i++) {
+            const p = sipData[i].open; // Use start of the month price
+            shares += monthlyInvestment / p;
+            invested += monthlyInvestment;
+            installments.push({
+                date: sipData[i].time * 1000,
+                price: p,
+                currentPrice: currentPrice,
+                difference: currentPrice - p
+            });
+        }
+
+        const finalValue = shares * currentPrice;
+        const cagr = calculateSIPCagr(totalMonths, finalValue, monthlyInvestment);
+
+        res.json({
+            ticker,
+            years,
+            invested: Math.round(invested),
+            finalValue: Math.round(finalValue * 100) / 100,
+            cagr: Math.round(cagr * 100) / 100,
+            installments
+        });
+
+    } catch (err) {
+        console.error('[API] SIP error:', err.message);
+        res.status(500).json({ error: 'Failed to calculate SIP', message: err.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`\n🚀 StockPulse server running at http://localhost:${PORT}\n`);
     console.log(`   Stock universe: ${IN_MEMORY_STOCKS.universe.length} total tickers, ${IN_MEMORY_STOCKS.active.length} active`);

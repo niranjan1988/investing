@@ -79,6 +79,12 @@
                         <line x1="2" y1="2" x2="22" y2="22"></line>
                     </svg>
                 </button>
+                <button class="theme-toggle" id="sipCalcBtn" title="SIP Calculator" aria-label="SIP Calculator">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </button>
                 <button class="theme-toggle" id="addStockBtn" title="Add tracked stock" aria-label="Add stock">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -412,6 +418,82 @@
                         Add Stock
                     </button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIP Calculator Modal -->
+    <div class="modal-overlay" id="sipModalOverlay">
+        <div class="modal" id="sipModal">
+            <button class="modal-close" id="sipModalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header" style="margin-bottom: 20px;">
+                <div class="modal-name" style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">SIP Calculator</div>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <label for="sipStockSelect" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Select Stock</label>
+                        <select id="sipStockSelect" style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sipDurationSelect" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Duration</label>
+                        <select id="sipDurationSelect" style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                            <option value="3">3 Years</option>
+                            <option value="5" selected>5 Years</option>
+                            <option value="10">10 Years</option>
+                        </select>
+                    </div>
+                    <button id="calculateSipBtn" style="margin-top: 10px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: background 0.2s;">
+                        Calculate SIP
+                    </button>
+                </div>
+
+                <div id="sipResultsContainer" style="display: none; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <div style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-secondary);">
+                        Based on <strong style="color:var(--text-primary)">$100</strong> invested every month.
+                    </div>
+                    <div class="modal-details" style="grid-template-columns: 1fr; gap: 10px;">
+                        <div class="detail-row" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--text-muted); display: flex; justify-content: space-between; align-items: center;">
+                            <span class="detail-label" style="font-size: 1rem;">Total Invested Amount</span>
+                            <span class="detail-value" id="sipInvested" style="font-size: 1.1rem; font-weight: 700;"></span>
+                        </div>
+                        <div class="detail-row" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center;">
+                            <span class="detail-label" style="font-size: 1rem;">Final Amount as of Today</span>
+                            <span class="detail-value" id="sipFinalValue" style="font-size: 1.1rem; font-weight: 700;"></span>
+                        </div>
+                        <div class="detail-row" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--green-500); display: flex; justify-content: space-between; align-items: center;">
+                            <span class="detail-label" style="font-size: 1rem;">SIP CAGR</span>
+                            <span class="detail-value" id="sipCagr" style="font-size: 1.1rem; font-weight: 700;"></span>
+                        </div>
+                    </div>
+                    
+                    <div style="max-height: 250px; overflow-y: auto; margin-top: 20px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                        <table class="stock-table" style="margin: 0; font-size: 0.9rem;">
+                            <thead style="position: sticky; top: 0; background: var(--bg-secondary); z-index: 1;">
+                                <tr>
+                                    <th style="padding: 10px; text-align: left; color: var(--text-muted); font-weight: 600;">Date</th>
+                                    <th style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">Invested Price</th>
+                                    <th style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">Current Price</th>
+                                    <th style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sipTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="sipLoading" style="display: none; padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                    Calculating historical returns...
+                </div>
+                <div id="sipError" style="display: none; padding: 15px; margin-top: 10px; background: rgba(239, 68, 68, 0.1); color: var(--red-400); border-radius: var(--radius-sm); font-size: 0.9rem; text-align: center;">
+                </div>
             </div>
         </div>
     </div>

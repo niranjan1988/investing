@@ -541,7 +541,14 @@ document.addEventListener('keydown', (e) => {
     // Alt+A to open Add Stock modal
     if (e.altKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();
-        if (addStockBtn) addStockBtn.click();
+        if (typeof addStockBtn !== 'undefined' && addStockBtn) addStockBtn.click();
+    }
+    
+    // Alt+S to open SIP Calculator
+    if (e.altKey && e.key.toLowerCase() === 's') {
+        const sipCalcBtn = document.getElementById('sipCalcBtn');
+        e.preventDefault();
+        if (sipCalcBtn) sipCalcBtn.click();
     }
     if (e.key === 'Escape') {
         if (modalOverlay.classList.contains('active')) {
@@ -901,6 +908,113 @@ initTheme();
 const themeToggle = document.getElementById('themeToggle');
 if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
+}
+
+// ============================================
+// SIP Calculator Logic
+// ============================================
+const sipCalcBtn = document.getElementById('sipCalcBtn');
+const sipModalOverlay = document.getElementById('sipModalOverlay');
+const sipModalClose = document.getElementById('sipModalClose');
+const sipStockSelect = document.getElementById('sipStockSelect');
+const sipDurationSelect = document.getElementById('sipDurationSelect');
+const calculateSipBtn = document.getElementById('calculateSipBtn');
+
+const sipResultsContainer = document.getElementById('sipResultsContainer');
+const sipInvested = document.getElementById('sipInvested');
+const sipFinalValue = document.getElementById('sipFinalValue');
+const sipCagr = document.getElementById('sipCagr');
+const sipLoading = document.getElementById('sipLoading');
+const sipError = document.getElementById('sipError');
+
+if (sipCalcBtn) {
+    sipCalcBtn.addEventListener('click', () => {
+        // Populate stocks dropdown
+        sipStockSelect.innerHTML = '';
+        const sortedStocks = [...stocksData].sort((a, b) => a.ticker.localeCompare(b.ticker));
+        if (sortedStocks.length === 0) {
+            sipStockSelect.innerHTML = '<option disabled>No stocks available</option>';
+        } else {
+            sortedStocks.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.ticker;
+                opt.textContent = `${s.ticker} - ${s.name}`;
+                if (s.ticker === activeModalTicker) opt.selected = true;
+                sipStockSelect.appendChild(opt);
+            });
+        }
+        
+        // Reset results area
+        sipResultsContainer.style.display = 'none';
+        sipError.style.display = 'none';
+        sipLoading.style.display = 'none';
+
+        sipModalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+}
+
+if (sipModalClose) {
+    sipModalClose.addEventListener('click', () => {
+        sipModalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+}
+
+if (calculateSipBtn) {
+    calculateSipBtn.addEventListener('click', async () => {
+        const ticker = sipStockSelect.value;
+        const years = sipDurationSelect.value;
+        if (!ticker) return;
+
+        sipLoading.style.display = 'block';
+        sipResultsContainer.style.display = 'none';
+        sipError.style.display = 'none';
+        calculateSipBtn.disabled = true;
+
+        try {
+            const res = await fetch(`/api/sip/${ticker}?years=${years}`);
+            const data = await res.json();
+
+            if (!res.ok || data.error) {
+                throw new Error(data.error || 'Failed to calculate SIP.');
+            }
+
+            sipInvested.textContent = '$' + data.invested.toLocaleString();
+            sipFinalValue.textContent = '$' + data.finalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
+            const cagrColor = data.cagr >= 0 ? 'var(--green-500)' : 'var(--red-400)';
+            sipCagr.innerHTML = `<span style="color: ${cagrColor}">${data.cagr >= 0 ? '+' : ''}${data.cagr.toFixed(2)}%</span>`;
+
+            const tbody = document.getElementById('sipTableBody');
+            if (tbody && data.installments) {
+                tbody.innerHTML = data.installments.map(inst => {
+                    const dateStr = new Date(inst.date).toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+                    const diffColor = inst.difference >= 0 ? 'var(--green-500)' : 'var(--red-400)';
+                    const diffSign = inst.difference >= 0 ? '+' : '';
+                    return `
+                        <tr style="border-bottom: 1px solid var(--border-color); background: var(--bg-primary);">
+                            <td style="padding: 10px; color: var(--text-primary);">${dateStr}</td>
+                            <td style="padding: 10px; text-align: right; color: var(--text-primary);">$${inst.price.toFixed(2)}</td>
+                            <td style="padding: 10px; text-align: right; color: var(--text-primary);">$${inst.currentPrice.toFixed(2)}</td>
+                            <td style="padding: 10px; text-align: right; color: ${diffColor};">
+                                ${diffSign}$${inst.difference.toFixed(2)}
+                            </td>
+                        </tr>
+                    `;
+                }).reverse().join(''); // Reverse to show latest first
+            }
+
+            sipLoading.style.display = 'none';
+            sipResultsContainer.style.display = 'block';
+        } catch (err) {
+            sipLoading.style.display = 'none';
+            sipError.textContent = err.message;
+            sipError.style.display = 'block';
+        } finally {
+            calculateSipBtn.disabled = false;
+        }
+    });
 }
 
 // ============================================
