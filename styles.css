@@ -902,6 +902,30 @@ body::before {
     border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
+.cap-mid {
+    background: rgba(6, 182, 212, 0.12);
+    color: var(--cyan-400);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.cap-small {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--green-400);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.cap-micro {
+    background: rgba(234, 179, 8, 0.12);
+    color: var(--yellow-400);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.cap-nano {
+    background: rgba(100, 116, 139, 0.12);
+    color: var(--text-muted);
+    border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
 .price-container {
     display: flex;
     flex-direction: column;
@@ -1553,6 +1577,30 @@ body::before {
     background: rgba(37, 99, 235, 0.08);
     color: #2563eb;
     border-color: rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="light"] .cap-mid {
+    background: rgba(8, 145, 178, 0.08);
+    color: #0891b2;
+    border-color: rgba(8, 145, 178, 0.2);
+}
+
+[data-theme="light"] .cap-small {
+    background: rgba(22, 163, 74, 0.08);
+    color: #16a34a;
+    border-color: rgba(22, 163, 74, 0.2);
+}
+
+[data-theme="light"] .cap-micro {
+    background: rgba(202, 138, 4, 0.08);
+    color: #ca8a04;
+    border-color: rgba(202, 138, 4, 0.2);
+}
+
+[data-theme="light"] .cap-nano {
+    background: rgba(100, 116, 139, 0.08);
+    color: #64748b;
+    border-color: rgba(100, 116, 139, 0.2);
 }
 
 [data-theme="light"] .stock-avatar {

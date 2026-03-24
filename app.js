@@ -138,6 +138,7 @@ async function fetchStockData(silent = false) {
             lastUpdatedEl.textContent = `Updated: ${ts.toLocaleString()}`;
         }
 
+        renderFilters();
         renderTable();
     } catch (err) {
         console.error('Failed to fetch stock data:', err);
@@ -196,18 +197,6 @@ function getFilteredAndSortedStocks() {
 
     // Apply filter
     switch (currentFilter) {
-        case 'tech':
-            stocks = stocks.filter(s => s.sector === 'Technology');
-            break;
-        case 'health':
-            stocks = stocks.filter(s => s.sector === 'Healthcare');
-            break;
-        case 'mega':
-            stocks = stocks.filter(s => s.cap === 'mega');
-            break;
-        case 'large':
-            stocks = stocks.filter(s => s.cap === 'large');
-            break;
         case 'ath':
             stocks = stocks.filter(s => s.drawdown <= 0);
             break;
@@ -219,6 +208,15 @@ function getFilteredAndSortedStocks() {
             break;
         case 'shortlisted':
             stocks = stocks.filter(s => shortlistedStocks.includes(s.ticker));
+            break;
+        default:
+            if (currentFilter.startsWith('sector:')) {
+                const sectorStr = currentFilter.replace('sector:', '');
+                stocks = stocks.filter(s => s.sector === sectorStr);
+            } else if (currentFilter.startsWith('cap:')) {
+                const capStr = currentFilter.replace('cap:', '');
+                stocks = stocks.filter(s => s.cap === capStr);
+            }
             break;
     }
 
@@ -249,6 +247,54 @@ function getFilteredAndSortedStocks() {
     });
 
     return stocks;
+}
+
+function renderFilters() {
+    const filterGroup = document.getElementById('filterGroupPrimary');
+    if (!filterGroup) return;
+
+    // Get unique sectors
+    const sectors = [...new Set(stocksData.map(s => s.sector))].filter(Boolean).sort();
+
+    // Get unique caps
+    const caps = [...new Set(stocksData.map(s => s.cap))].filter(Boolean);
+    const capOrder = ['mega', 'large', 'mid', 'small', 'micro', 'nano'];
+    caps.sort((a, b) => {
+        let indexA = capOrder.indexOf(a.toLowerCase());
+        let indexB = capOrder.indexOf(b.toLowerCase());
+        if (indexA === -1) indexA = 999;
+        if (indexB === -1) indexB = 999;
+        return indexA - indexB;
+    });
+
+    const isSectorFilter = currentFilter.startsWith('sector:');
+    if (isSectorFilter && !sectors.includes(currentFilter.replace('sector:', ''))) {
+        currentFilter = 'all'; // Reset if sector no longer exists
+    }
+
+    const isCapFilter = currentFilter.startsWith('cap:');
+    if (isCapFilter && !caps.includes(currentFilter.replace('cap:', ''))) {
+        currentFilter = 'all'; // Reset if cap no longer exists
+    }
+
+    let html = `<button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all" id="filterAll">All</button>`;
+    
+    sectors.forEach(sector => {
+        const filterVal = 'sector:' + sector;
+        const isActive = currentFilter === filterVal;
+        html += `<button class="filter-btn ${isActive ? 'active' : ''}" data-filter="${filterVal}">${sector}</button>`;
+    });
+
+    caps.forEach(cap => {
+        const filterVal = 'cap:' + cap;
+        const isActive = currentFilter === filterVal;
+        const capLabel = cap.charAt(0).toUpperCase() + cap.slice(1) + ' Cap';
+        html += `<button class="filter-btn ${isActive ? 'active' : ''}" data-filter="${filterVal}">${capLabel}</button>`;
+    });
+
+    html += `<button class="filter-btn ${currentFilter === 'shortlisted' ? 'active' : ''}" data-filter="shortlisted" id="filterShortlisted">Shortlisted</button>`;
+
+    filterGroup.innerHTML = html;
 }
 
 function renderTable() {
@@ -564,15 +610,16 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Filter buttons
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (btn) {
         // Remove active from all buttons
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         // Set this button as active
         btn.classList.add('active');
         currentFilter = btn.dataset.filter;
         renderTable();
-    });
+    }
 });
 
 // Sort
@@ -840,19 +887,20 @@ if (addStockForm) {
     addStockForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const ticker = document.getElementById('addTicker').value;
-        const sector = document.getElementById('addSector').value;
-        const cap = document.getElementById('addCap').value;
+        const tickersRaw = document.getElementById('addTicker').value;
+        const tickers = tickersRaw.split(',').map(t => t.trim()).filter(t => t);
+
+        if (tickers.length === 0) return;
 
         submitAddStockBtn.disabled = true;
-        submitAddStockBtn.textContent = 'Adding...';
+        submitAddStockBtn.textContent = tickers.length > 1 ? 'Adding Stocks...' : 'Adding...';
         submitAddStockBtn.style.opacity = '0.7';
 
         try {
-            const res = await fetch('/api/stocks/add', {
+            const res = await fetch('/api/stocks/add-bulk', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ticker, sector, cap })
+                body: JSON.stringify({ tickers })
             });
             const data = await res.json();
 

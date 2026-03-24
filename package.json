@@ -4,7 +4,7 @@
   "description": "US Mega & Large Cap Stock ATH Tracker",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "dev": "nodemon -e js,html,css server.js"
   },
   "dependencies": {

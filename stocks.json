@@ -55,7 +55,28 @@
     "DXCM",
     "UTHR",
     "FSLR",
-    "CRDO"
+    "CRDO",
+    "GOOG",
+    "RDDT",
+    "ALAB",
+    "INCY",
+    "PTC",
+    "NVMI",
+    "LOGI",
+    "RMBS",
+    "PEGA",
+    "KRYS",
+    "YOU",
+    "PCTY",
+    "DOCS",
+    "CLBT",
+    "CPRX",
+    "SEZL",
+    "ETOR",
+    "AUPH",
+    "INVA",
+    "HRMY",
+    "IRMD"
   ],
   "universe": [
     {
@@ -392,6 +413,111 @@
       "ticker": "CRDO",
       "sector": "Technology",
       "cap": "large"
+    },
+    {
+      "ticker": "GOOG",
+      "sector": "Communication Services",
+      "cap": "mega"
+    },
+    {
+      "ticker": "RDDT",
+      "sector": "Communication Services",
+      "cap": "large"
+    },
+    {
+      "ticker": "ALAB",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "INCY",
+      "sector": "Healthcare",
+      "cap": "large"
+    },
+    {
+      "ticker": "PTC",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "NVMI",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "LOGI",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "RMBS",
+      "sector": "Technology",
+      "cap": "large"
+    },
+    {
+      "ticker": "PEGA",
+      "sector": "Technology",
+      "cap": "small"
+    },
+    {
+      "ticker": "KRYS",
+      "sector": "Healthcare",
+      "cap": "small"
+    },
+    {
+      "ticker": "YOU",
+      "sector": "Technology",
+      "cap": "small"
+    },
+    {
+      "ticker": "PCTY",
+      "sector": "Technology",
+      "cap": "small"
+    },
+    {
+      "ticker": "DOCS",
+      "sector": "Healthcare",
+      "cap": "small"
+    },
+    {
+      "ticker": "CLBT",
+      "sector": "Technology",
+      "cap": "small"
+    },
+    {
+      "ticker": "CPRX",
+      "sector": "Healthcare",
+      "cap": "small"
+    },
+    {
+      "ticker": "SEZL",
+      "sector": "Financial Services",
+      "cap": "small"
+    },
+    {
+      "ticker": "ETOR",
+      "sector": "Financial Services",
+      "cap": "small"
+    },
+    {
+      "ticker": "AUPH",
+      "sector": "Healthcare",
+      "cap": "small"
+    },
+    {
+      "ticker": "INVA",
+      "sector": "Healthcare",
+      "cap": "small"
+    },
+    {
+      "ticker": "HRMY",
+      "sector": "Healthcare",
+      "cap": "small"
+    },
+    {
+      "ticker": "IRMD",
+      "sector": "Healthcare",
+      "cap": "small"
     }
   ],
   "shortlisted": [

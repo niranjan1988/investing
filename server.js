@@ -391,40 +391,77 @@ app.post('/api/stocks/toggle', (req, res) => {
     }
 });
 
-// API route to add a new stock
-app.post('/api/stocks/add', (req, res) => {
+// API route to add multiple new stocks
+app.post('/api/stocks/add-bulk', async (req, res) => {
     try {
-        const { ticker, sector, cap } = req.body;
-        if (!ticker || !sector || !cap) {
-            return res.status(400).json({ error: 'Ticker, sector, and cap are required' });
+        const { tickers } = req.body;
+        if (!tickers || !Array.isArray(tickers) || tickers.length === 0) {
+            return res.status(400).json({ error: 'Tickers array is required' });
         }
 
-        const cleanTicker = ticker.toUpperCase().trim();
+        const addedTickers = [];
+        const ignoredTickers = [];
 
-        // Check if already in universe
-        const exists = IN_MEMORY_STOCKS.universe.find(s => s.ticker === cleanTicker);
-        if (exists) {
-            const isActive = IN_MEMORY_STOCKS.active.includes(cleanTicker);
-            const errorMsg = isActive
-                ? 'Stock already exists.'
-                : 'Stock already exists in the deactivated list. Please reactivate it.';
-            return res.status(400).json({ error: errorMsg });
+        for (const rawTicker of tickers) {
+            const cleanTicker = rawTicker.toUpperCase().trim();
+            if (!cleanTicker) continue;
+
+            const exists = IN_MEMORY_STOCKS.universe.find(s => s.ticker === cleanTicker);
+            if (exists) {
+                // Ignore if it exists
+                ignoredTickers.push(cleanTicker);
+                continue;
+            }
+
+            // Fetch sector from Yahoo Finance search API
+            let sector = 'Unknown';
+            try {
+                const searchUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${cleanTicker}&quotesCount=1`;
+                const searchRes = await fetch(searchUrl, { headers: { 'User-Agent': YAHOO_UA } });
+                if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    if (searchData.quotes && searchData.quotes.length > 0) {
+                        sector = searchData.quotes[0].sector || 'Unknown';
+                    }
+                }
+            } catch (e) {
+                console.error(`[API] Failed to fetch sector for ${cleanTicker}`, e);
+            }
+
+            // Fetch cap using internal fetchBatchQuotes
+            let cap = 'large';
+            try {
+                const quoteMap = await fetchBatchQuotes([cleanTicker]);
+                const quote = quoteMap[cleanTicker];
+                if (quote && quote.mcap) {
+                    if (quote.mcap > 200) cap = 'mega';
+                    else if (quote.mcap < 10) cap = 'small';
+                }
+            } catch (e) {
+                console.error(`[API] Failed to fetch market cap for ${cleanTicker}`, e);
+            }
+
+            IN_MEMORY_STOCKS.universe.push({ ticker: cleanTicker, sector, cap });
+
+            // Ensure it's active
+            let newActive = new Set(IN_MEMORY_STOCKS.active);
+            newActive.add(cleanTicker);
+            IN_MEMORY_STOCKS.active = Array.from(newActive);
+
+            addedTickers.push(cleanTicker);
         }
-
-        IN_MEMORY_STOCKS.universe.push({ ticker: cleanTicker, sector, cap });
-
-        // Ensure it's active
-        let newActive = new Set(IN_MEMORY_STOCKS.active);
-        newActive.add(cleanTicker);
-        IN_MEMORY_STOCKS.active = Array.from(newActive);
 
         saveStocks();
         fullDataCache = null; // invalidate cache
 
-        res.json({ success: true, ticker: cleanTicker });
+        if (addedTickers.length === 0 && ignoredTickers.length > 0) {
+            return res.status(400).json({ error: 'All provided stocks already exist (or are deactivated).' });
+        }
+
+        res.json({ success: true, added: addedTickers, ignored: ignoredTickers });
     } catch (err) {
-        console.error('[API] Error adding stock:', err.message);
-        res.status(500).json({ error: 'Failed to add stock' });
+        console.error('[API] Error adding bulk stocks:', err.message);
+        res.status(500).json({ error: 'Failed to add stocks' });
     }
 });
 

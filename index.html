@@ -164,12 +164,8 @@
 
         <!-- Filter & Sort Controls -->
         <section class="controls-section">
-            <div class="filter-group">
+            <div class="filter-group" id="filterGroupPrimary">
                 <button class="filter-btn active" data-filter="all" id="filterAll">All</button>
-                <button class="filter-btn" data-filter="tech" id="filterTech">Technology</button>
-                <button class="filter-btn" data-filter="health" id="filterHealth">Healthcare</button>
-                <button class="filter-btn" data-filter="mega" id="filterMega">Mega Cap</button>
-                <button class="filter-btn" data-filter="large" id="filterLarge">Large Cap</button>
                 <button class="filter-btn" data-filter="shortlisted" id="filterShortlisted">Shortlisted</button>
             </div>
             <div class="filter-group">
@@ -390,28 +386,10 @@
                     <div>
                         <label for="addTicker"
                             style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Ticker
-                            Symbol</label>
-                        <input type="text" id="addTicker" required placeholder="e.g. AAPL"
+                            Symbols</label>
+                        <input type="text" id="addTicker" required placeholder="e.g. AAPL, MSFT, GOOG"
                             style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
-                    </div>
-                    <div>
-                        <label for="addSector"
-                            style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Sector</label>
-                        <select id="addSector" required
-                            style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
-                            <option value="Technology">Technology</option>
-                            <option value="Healthcare">Healthcare</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="addCap"
-                            style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Cap
-                            Size</label>
-                        <select id="addCap" required
-                            style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
-                            <option value="mega">Mega Cap (>$200B)</option>
-                            <option value="large" selected>Large Cap ($10B-$200B)</option>
-                        </select>
+                        <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 5px;">Separate multiple tickers with commas. Sector and Market Cap will be auto-fetched.</small>
                     </div>
                     <button type="submit" id="submitAddStockBtn"
                         style="margin-top: 10px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: background 0.2s;">
