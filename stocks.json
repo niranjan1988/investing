@@ -1,7 +1,6 @@
 {
   "active": [
     "NVDA",
-    "AAPL",
     "AMZN",
     "MSFT",
     "META",
@@ -65,7 +64,12 @@
     "AUPH",
     "INVA",
     "IRMD",
-    "GOOG"
+    "GOOG",
+    "RDDT",
+    "ALAB",
+    "CRDO",
+    "HRMY",
+    "ORCL"
   ],
   "universe": [
     {
@@ -271,7 +275,7 @@
     {
       "ticker": "ASML",
       "sector": "Technology",
-      "cap": "large"
+      "cap": "mega"
     },
     {
       "ticker": "ANET",
@@ -331,7 +335,7 @@
     {
       "ticker": "MU",
       "sector": "Technology",
-      "cap": "large"
+      "cap": "mega"
     },
     {
       "ticker": "NFLX",
@@ -517,21 +521,42 @@
     "TSM",
     "META",
     "AVGO",
-    "LLY",
     "ASML",
-    "ANET",
-    "APP",
-    "VRTX",
-    "CRWD",
-    "VRT",
     "MELI",
-    "CDNS",
     "HOOD",
-    "MPWR",
     "COIN",
     "MSTR",
-    "MEDP",
+    "GOOG",
+    "ADBE",
+    "FTNT",
+    "RMBS",
+    "PCTY",
+    "ISRG",
+    "IDXX",
+    "IRMD",
+    "NFLX",
+    "PLTR",
+    "ANET",
+    "PANW",
+    "MPWR",
+    "ADSK",
+    "UI",
+    "RDDT",
+    "PTC",
     "APPF",
-    "ADMA"
+    "DUOL",
+    "CLBT",
+    "CRDO",
+    "ALAB",
+    "UTHR",
+    "MU",
+    "VRT",
+    "LLY",
+    "CDNS",
+    "CRWD",
+    "TSLA",
+    "AMD",
+    "DXCM",
+    "HRMY"
   ]
 }

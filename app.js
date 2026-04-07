@@ -233,6 +233,9 @@ function getFilteredAndSortedStocks() {
             case 'name':
                 comparison = a.name.localeCompare(b.name);
                 break;
+            case 'sector':
+                comparison = a.sector.localeCompare(b.sector);
+                break;
             case 'price':
                 comparison = b.price - a.price;
                 break;
