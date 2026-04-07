@@ -304,7 +304,6 @@ app.get('/api/stocks', async (req, res) => {
                 ticker: config.ticker,
                 name: quote.name || config.ticker,
                 sector: config.sector,
-                cap: config.cap,
                 price: Math.round(price * 100) / 100,
                 previousClose: Math.round((quote.previousClose || 0) * 100) / 100,
                 mcap: Math.round(quote.mcap * 10) / 10 || 0,
@@ -430,20 +429,7 @@ app.post('/api/stocks/add-bulk', async (req, res) => {
                 console.error(`[API] Failed to fetch sector for ${cleanTicker}`, e);
             }
 
-            // Fetch cap using internal fetchBatchQuotes
-            let cap = 'large';
-            try {
-                const quoteMap = await fetchBatchQuotes([cleanTicker]);
-                const quote = quoteMap[cleanTicker];
-                if (quote && quote.mcap) {
-                    if (quote.mcap > 200) cap = 'mega';
-                    else if (quote.mcap < 10) cap = 'small';
-                }
-            } catch (e) {
-                console.error(`[API] Failed to fetch market cap for ${cleanTicker}`, e);
-            }
-
-            IN_MEMORY_STOCKS.universe.push({ ticker: cleanTicker, sector, cap });
+            IN_MEMORY_STOCKS.universe.push({ ticker: cleanTicker, sector });
 
             // Ensure it's active
             let newActive = new Set(IN_MEMORY_STOCKS.active);

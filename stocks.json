@@ -74,443 +74,355 @@
   "universe": [
     {
       "ticker": "NVDA",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "AAPL",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "GOOGL",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "AMZN",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "MSFT",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "META",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "TSLA",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "AVGO",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "ORCL",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "PLTR",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "AMD",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "ADBE",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "INTC",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "IBM",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "TXN",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "PANW",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "NOW",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "SNPS",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "CDNS",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "APH",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "CRWD",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "SNOW",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "DDOG",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "MRVL",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "KLAC",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "LRCX",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "FTNT",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "ZS",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "OKTA",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "MDB",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "LLY",
-      "sector": "Healthcare",
-      "cap": "mega"
+      "sector": "Healthcare"
     },
     {
       "ticker": "ABBV",
-      "sector": "Healthcare",
-      "cap": "mega"
+      "sector": "Healthcare"
     },
     {
       "ticker": "MRK",
-      "sector": "Healthcare",
-      "cap": "mega"
+      "sector": "Healthcare"
     },
     {
       "ticker": "ABT",
-      "sector": "Healthcare",
-      "cap": "mega"
+      "sector": "Healthcare"
     },
     {
       "ticker": "VRTX",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "REGN",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "NET",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "TSM",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "MELI",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "APP",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "ASML",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "ANET",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "MPWR",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "VRT",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "ADMA",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     },
     {
       "ticker": "MEDP",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "APPF",
-      "sector": "Technology",
-      "cap": "small"
+      "sector": "Technology"
     },
     {
       "ticker": "DUOL",
-      "sector": "Technology",
-      "cap": "small"
+      "sector": "Technology"
     },
     {
       "ticker": "COIN",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "HOOD",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "MSTR",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "RKLB",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "MU",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "NFLX",
-      "sector": "Technology",
-      "cap": "mega"
+      "sector": "Technology"
     },
     {
       "ticker": "ISRG",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "NVO",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "INTU",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "ADSK",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "UI",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "IDXX",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "TER",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "GRMN",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "ARGX",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "DXCM",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "UTHR",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "FSLR",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "CRDO",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "GOOG",
-      "sector": "Communication Services",
-      "cap": "mega"
+      "sector": "Communication Services"
     },
     {
       "ticker": "RDDT",
-      "sector": "Communication Services",
-      "cap": "large"
+      "sector": "Communication Services"
     },
     {
       "ticker": "ALAB",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "INCY",
-      "sector": "Healthcare",
-      "cap": "large"
+      "sector": "Healthcare"
     },
     {
       "ticker": "PTC",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "NVMI",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "LOGI",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "RMBS",
-      "sector": "Technology",
-      "cap": "large"
+      "sector": "Technology"
     },
     {
       "ticker": "PEGA",
-      "sector": "Technology",
-      "cap": "small"
+      "sector": "Technology"
     },
     {
       "ticker": "KRYS",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     },
     {
       "ticker": "YOU",
-      "sector": "Technology",
-      "cap": "small"
+      "sector": "Technology"
     },
     {
       "ticker": "PCTY",
-      "sector": "Technology",
-      "cap": "small"
+      "sector": "Technology"
     },
     {
       "ticker": "DOCS",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     },
     {
       "ticker": "CLBT",
-      "sector": "Technology",
-      "cap": "small"
+      "sector": "Technology"
     },
     {
       "ticker": "CPRX",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     },
     {
       "ticker": "SEZL",
-      "sector": "Financial Services",
-      "cap": "small"
+      "sector": "Financial Services"
     },
     {
       "ticker": "ETOR",
-      "sector": "Financial Services",
-      "cap": "small"
+      "sector": "Financial Services"
     },
     {
       "ticker": "AUPH",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     },
     {
       "ticker": "INVA",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     },
     {
       "ticker": "HRMY",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     },
     {
       "ticker": "IRMD",
-      "sector": "Healthcare",
-      "cap": "small"
+      "sector": "Healthcare"
     }
   ],
   "shortlisted": [

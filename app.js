@@ -131,6 +131,14 @@ async function fetchStockData(silent = false) {
         }
 
         stocksData = data.stocks || [];
+        stocksData.forEach(s => {
+            if (s.mcap >= 200) s.cap = 'mega';
+            else if (s.mcap >= 10) s.cap = 'large';
+            else if (s.mcap >= 2) s.cap = 'mid';
+            else if (s.mcap >= 0.3) s.cap = 'small';
+            else if (s.mcap >= 0.05) s.cap = 'micro';
+            else s.cap = 'nano';
+        });
 
         // Update last-updated timestamp
         if (data.timestamp) {
