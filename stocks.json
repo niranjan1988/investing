@@ -2,7 +2,6 @@
   "active": [
     "NVDA",
     "AAPL",
-    "GOOGL",
     "AMZN",
     "MSFT",
     "META",
@@ -25,7 +24,6 @@
     "ZS",
     "LLY",
     "VRTX",
-    "NET",
     "TSM",
     "MELI",
     "APP",
@@ -54,17 +52,9 @@
     "ARGX",
     "DXCM",
     "UTHR",
-    "FSLR",
-    "CRDO",
-    "GOOG",
-    "RDDT",
-    "ALAB",
-    "INCY",
     "PTC",
     "NVMI",
-    "LOGI",
     "RMBS",
-    "PEGA",
     "KRYS",
     "YOU",
     "PCTY",
@@ -72,11 +62,10 @@
     "CLBT",
     "CPRX",
     "SEZL",
-    "ETOR",
     "AUPH",
     "INVA",
-    "HRMY",
-    "IRMD"
+    "IRMD",
+    "GOOG"
   ],
   "universe": [
     {
@@ -137,7 +126,7 @@
     {
       "ticker": "ADBE",
       "sector": "Technology",
-      "cap": "mega"
+      "cap": "large"
     },
     {
       "ticker": "INTC",
@@ -302,7 +291,7 @@
     {
       "ticker": "ADMA",
       "sector": "Healthcare",
-      "cap": "large"
+      "cap": "small"
     },
     {
       "ticker": "MEDP",
@@ -312,12 +301,12 @@
     {
       "ticker": "APPF",
       "sector": "Technology",
-      "cap": "large"
+      "cap": "small"
     },
     {
       "ticker": "DUOL",
       "sector": "Technology",
-      "cap": "large"
+      "cap": "small"
     },
     {
       "ticker": "COIN",

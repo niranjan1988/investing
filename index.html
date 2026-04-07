@@ -202,7 +202,7 @@
                             <th class="col-stock">Stock</th>
                             <th class="col-sector">Sector</th>
                             <th class="col-cap">Cap</th>
-                            <th class="col-mcap">Market Cap</th>
+                            <th class="col-mcap">Market Cap <span style="color: var(--text-dim); font-size: 0.9em; text-transform: none;">(P/E)</span></th>
                             <th class="col-price">Current Price</th>
                             <th class="col-ath">All-Time High</th>
                             <th class="col-drawdown">% From ATH</th>
@@ -303,7 +303,10 @@
                 <div class="modal-details" style="grid-template-columns: 1fr 1fr;">
                     <div class="detail-row">
                         <span class="detail-label">Market Cap</span>
-                        <span class="detail-value" id="modalMcap"></span>
+                        <div style="display: flex; gap: 8px; align-items: baseline;">
+                            <span class="detail-value" id="modalMcap"></span>
+                            <span id="modalPe" style="font-size: 0.85em; color: var(--text-muted); font-weight: 500;"></span>
+                        </div>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">1Y CAGR</span>
@@ -475,6 +478,14 @@
             </div>
         </div>
     </div>
+
+    <!-- Go to Top Button -->
+    <button id="goToTopBtn" class="go-to-top" aria-label="Go to top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+    </button>
 
     <script src="app.js"></script>
 </body>

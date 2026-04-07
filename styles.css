@@ -715,18 +715,30 @@ body::before {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    overflow: hidden;
 }
 
 .stock-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .stock-table thead {
     position: sticky;
     top: 0;
     z-index: 10;
+}
+
+#stockTable thead {
+    top: 91px;
+}
+
+#stockTable th:first-child {
+    border-top-left-radius: calc(var(--radius-lg) - 1px);
+}
+
+#stockTable th:last-child {
+    border-top-right-radius: calc(var(--radius-lg) - 1px);
 }
 
 .stock-table th {
@@ -760,6 +772,14 @@ body::before {
 
 .stock-table tbody tr:last-child td {
     border-bottom: none;
+}
+
+#stockTable tbody tr:last-child td:first-child {
+    border-bottom-left-radius: calc(var(--radius-lg) - 1px);
+}
+
+#stockTable tbody tr:last-child td:last-child {
+    border-bottom-right-radius: calc(var(--radius-lg) - 1px);
 }
 
 /* Column Styles */
@@ -1714,4 +1734,46 @@ body::before {
     color: var(--red-400);
     padding: var(--space-sm) 0;
     font-size: 0.85rem;
+}
+
+/* ============================================
+   GO TO TOP BUTTON
+   ============================================ */
+.go-to-top {
+    position: fixed;
+    bottom: var(--space-xl);
+    right: var(--space-xl);
+    width: 44px;
+    height: 44px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md), 0 0 0 2px var(--bg-primary);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all var(--duration-normal) var(--ease-spring);
+    z-index: 900;
+}
+
+.go-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.go-to-top:hover {
+    background: var(--blue-500);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), 0 0 0 2px var(--bg-primary);
+}
+
+.go-to-top svg {
+    width: 18px;
+    height: 18px;
 }

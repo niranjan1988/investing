@@ -347,13 +347,24 @@ function renderTable() {
                                         <polyline points="7 7 17 7 17 17"></polyline>
                                     </svg>
                                 </a>
+                                <button type="button" class="tv-btn" onclick="openSipModalForStock(event, '${stock.ticker}')" aria-label="Calculate SIP" title="Calculate SIP" style="background: none; border: none; padding: 0; cursor: pointer;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </td>
-                <td class="col-sector"><span class="sector-badge">${stock.sector}</span></td>
+                <td class="col-sector"><span class="sector-badge" style="background:${avatarColors.bg};color:${avatarColors.color};border-color:${avatarColors.color}33">${stock.sector}</span></td>
                 <td class="col-cap"><span class="cap-badge cap-${stock.cap}">${stock.cap}</span></td>
-                <td class="col-mcap"><span class="price-cell">${formatMarketCap(stock.mcap)}</span></td>
+                <td class="col-mcap">
+                    <div class="price-container">
+                        <span class="price-cell">${formatMarketCap(stock.mcap)}</span>
+                        ${stock.pe ? `<span class="prev-close-cell">P/E: ${stock.pe}</span>` : `<span class="prev-close-cell" style="opacity:0.5">P/E: —</span>`}
+                    </div>
+                </td>
                 <td class="col-price">
                     <div class="price-container">
                         <span class="price-cell ${priceChangeClass}">${formatPrice(stock.price)} <span style="font-size: 0.75em; opacity: 0.9; margin-left: 4px;">${changeStr}</span></span>
@@ -481,7 +492,12 @@ function openModal(ticker) {
 
     document.getElementById('modalTicker').textContent = stock.ticker;
     document.getElementById('modalName').textContent = stock.name;
-    document.getElementById('modalSector').textContent = stock.sector;
+    const modalSectorEl = document.getElementById('modalSector');
+    modalSectorEl.textContent = stock.sector;
+    const avatarColors = getAvatarColor(stock.sector);
+    modalSectorEl.style.background = avatarColors.bg;
+    modalSectorEl.style.color = avatarColors.color;
+    modalSectorEl.style.borderColor = avatarColors.color + '33';
     document.getElementById('modalPrice').textContent = formatPrice(stock.price);
 
     const isShortlisted = shortlistedStocks.includes(ticker);
@@ -509,6 +525,8 @@ function openModal(ticker) {
     drawdownEl.className = 'metric-value' + (drawdown <= 0 ? ' at-ath-modal' : '');
 
     document.getElementById('modalMcap').textContent = formatMarketCap(stock.mcap);
+    const modalPeEl = document.getElementById('modalPe');
+    if (modalPeEl) modalPeEl.textContent = stock.pe ? `P/E: ${stock.pe}` : 'P/E: —';
     document.getElementById('modalDollarBelow').textContent = drawdown <= 0 ? '—' : formatPrice(dollarsBelow);
     document.getElementById('modalRecovery').textContent = drawdown <= 0 ? '—' : '+' + recoveryNeeded.toFixed(2) + '%';
 
@@ -975,30 +993,40 @@ const sipCagr = document.getElementById('sipCagr');
 const sipLoading = document.getElementById('sipLoading');
 const sipError = document.getElementById('sipError');
 
+window.openSipModal = function(ticker = null) {
+    // Populate stocks dropdown
+    sipStockSelect.innerHTML = '';
+    const sortedStocks = [...stocksData].sort((a, b) => a.ticker.localeCompare(b.ticker));
+    if (sortedStocks.length === 0) {
+        sipStockSelect.innerHTML = '<option disabled>No stocks available</option>';
+    } else {
+        const preselectedTicker = ticker || activeModalTicker;
+        sortedStocks.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.ticker;
+            opt.textContent = `${s.ticker} - ${s.name}`;
+            if (s.ticker === preselectedTicker) opt.selected = true;
+            sipStockSelect.appendChild(opt);
+        });
+    }
+    
+    // Reset results area
+    sipResultsContainer.style.display = 'none';
+    sipError.style.display = 'none';
+    sipLoading.style.display = 'none';
+
+    sipModalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+window.openSipModalForStock = function(event, ticker) {
+    event.stopPropagation();
+    window.openSipModal(ticker);
+};
+
 if (sipCalcBtn) {
     sipCalcBtn.addEventListener('click', () => {
-        // Populate stocks dropdown
-        sipStockSelect.innerHTML = '';
-        const sortedStocks = [...stocksData].sort((a, b) => a.ticker.localeCompare(b.ticker));
-        if (sortedStocks.length === 0) {
-            sipStockSelect.innerHTML = '<option disabled>No stocks available</option>';
-        } else {
-            sortedStocks.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.ticker;
-                opt.textContent = `${s.ticker} - ${s.name}`;
-                if (s.ticker === activeModalTicker) opt.selected = true;
-                sipStockSelect.appendChild(opt);
-            });
-        }
-        
-        // Reset results area
-        sipResultsContainer.style.display = 'none';
-        sipError.style.display = 'none';
-        sipLoading.style.display = 'none';
-
-        sipModalOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        window.openSipModal();
     });
 }
 
@@ -1062,6 +1090,28 @@ if (calculateSipBtn) {
         } finally {
             calculateSipBtn.disabled = false;
         }
+    });
+}
+
+// ============================================
+// Go to Top Button
+// ============================================
+const goToTopBtn = document.getElementById('goToTopBtn');
+
+if (goToTopBtn) {
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+            goToTopBtn.classList.add('visible');
+        } else {
+            goToTopBtn.classList.remove('visible');
+        }
+    });
+
+    goToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
 }
 

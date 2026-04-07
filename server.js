@@ -142,6 +142,7 @@ async function fetchBatchQuotes(tickers) {
         quoteMap[ourTicker] = {
             price: q.regularMarketPrice ?? 0,
             mcap: (q.marketCap ?? 0) / 1e9, // Convert to billions
+            pe: q.trailingPE || q.forwardPE || null,
             name: q.longName || q.shortName || ourTicker,
             fiftyTwoWeekHigh: q.fiftyTwoWeekHigh ?? 0,
             previousClose: q.regularMarketPreviousClose ?? 0,
@@ -307,6 +308,7 @@ app.get('/api/stocks', async (req, res) => {
                 price: Math.round(price * 100) / 100,
                 previousClose: Math.round((quote.previousClose || 0) * 100) / 100,
                 mcap: Math.round(quote.mcap * 10) / 10 || 0,
+                pe: quote.pe ? Math.round(quote.pe * 100) / 100 : null,
                 ath: Math.round(finalATH * 100) / 100,
                 cagr1Y: computeCAGR(price, past1Y, 1),
                 cagr3Y: computeCAGR(price, past3Y, 3),
