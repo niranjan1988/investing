@@ -817,6 +817,11 @@ body::before {
     width: 150px;
 }
 
+.col-dma {
+    text-align: center !important;
+    min-width: 110px;
+}
+
 /* Cell Content Styles */
 .rank-num {
     font-weight: 600;

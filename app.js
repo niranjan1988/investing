@@ -214,6 +214,9 @@ function getFilteredAndSortedStocks() {
         case 'deep':
             stocks = stocks.filter(s => s.drawdown > 20);
             break;
+        case 'below200dma':
+            stocks = stocks.filter(s => s.below200DMA === true);
+            break;
         case 'shortlisted':
             stocks = stocks.filter(s => shortlistedStocks.includes(s.ticker));
             break;
@@ -386,6 +389,11 @@ function renderTable() {
                 <td class="col-drawdown">
                     <span class="drawdown-cell ${drawdownClass}">
                         ${drawdown <= 0 ? '🟢 ATH' : '-' + drawdown.toFixed(2) + '%'}
+                    </span>
+                </td>
+                <td class="col-dma" style="text-align: center;">
+                    <span class="dma-cell ${stock.below200DMA === true ? 'price-down' : (stock.below200DMA === false ? 'price-up' : '')}">
+                        ${stock.below200DMA === true ? 'Yes' : (stock.below200DMA === false ? 'No' : '—')}
                     </span>
                 </td>
                 <td class="col-cagr">

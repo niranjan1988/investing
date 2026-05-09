@@ -146,6 +146,7 @@ async function fetchBatchQuotes(tickers) {
             name: q.longName || q.shortName || ourTicker,
             fiftyTwoWeekHigh: q.fiftyTwoWeekHigh ?? 0,
             previousClose: q.regularMarketPreviousClose ?? 0,
+            twoHundredDayAverage: q.twoHundredDayAverage ?? null,
         };
     }
     return quoteMap;
@@ -309,6 +310,7 @@ app.get('/api/stocks', async (req, res) => {
                 mcap: Math.round(quote.mcap * 10) / 10 || 0,
                 pe: quote.pe ? Math.round(quote.pe * 100) / 100 : null,
                 ath: Math.round(finalATH * 100) / 100,
+                below200DMA: quote.twoHundredDayAverage ? (price < quote.twoHundredDayAverage) : null,
                 cagr1Y: computeCAGR(price, past1Y, 1),
                 cagr3Y: computeCAGR(price, past3Y, 3),
                 cagr5Y: computeCAGR(price, past5Y, 5),

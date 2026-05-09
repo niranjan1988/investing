@@ -33,7 +33,6 @@
     "ADMA",
     "MEDP",
     "APPF",
-    "DUOL",
     "COIN",
     "HOOD",
     "MSTR",
@@ -55,7 +54,6 @@
     "NVMI",
     "RMBS",
     "KRYS",
-    "YOU",
     "PCTY",
     "DOCS",
     "CLBT",
@@ -68,8 +66,7 @@
     "RDDT",
     "ALAB",
     "CRDO",
-    "HRMY",
-    "ORCL"
+    "HRMY"
   ],
   "universe": [
     {
@@ -342,11 +339,11 @@
     },
     {
       "ticker": "GOOG",
-      "sector": "Communication Services"
+      "sector": "Technology"
     },
     {
       "ticker": "RDDT",
-      "sector": "Communication Services"
+      "sector": "Technology"
     },
     {
       "ticker": "ALAB",
@@ -456,7 +453,6 @@
     "RDDT",
     "PTC",
     "APPF",
-    "DUOL",
     "CLBT",
     "CRDO",
     "ALAB",
