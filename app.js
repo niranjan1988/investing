@@ -590,8 +590,8 @@ function openTradingViewPanel(ticker) {
     const chartPanelBody = document.getElementById('chartPanelBody');
     const chartPanelTitle = document.getElementById('chartPanelTitle');
     
-    // Set title
-    chartPanelTitle.textContent = `${ticker} - TradingView`;
+    // Set title with a link to the full chart
+    chartPanelTitle.innerHTML = `${ticker} - TradingView <a href="https://www.tradingview.com/chart/?symbol=${ticker}" target="_blank" title="Open full chart for Financial Indicators" style="margin-left: 10px; font-size: 0.8rem; color: var(--accent); text-decoration: underline; text-underline-offset: 2px;">↗ Open Full Chart</a>`;
     
     // Get current theme
     const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
@@ -600,7 +600,7 @@ function openTradingViewPanel(ticker) {
     // TradingView Lightweight widget embed
     chartPanelBody.innerHTML = `
         <iframe 
-            src="https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&theme=${currentTheme}&style=1" 
+            src="https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=W&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&theme=${currentTheme}&style=1" 
             width="100%" 
             height="100%" 
             frameborder="0" 
