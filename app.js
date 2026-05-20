@@ -86,6 +86,7 @@ const deactivatedEmpty = document.getElementById('deactivatedEmpty');
 
 // Add Stock Modal
 const addStockBtn = document.getElementById('addStockBtn');
+const exportExcelBtn = document.getElementById('exportExcelBtn');
 const addStockModalOverlay = document.getElementById('addStockModalOverlay');
 const addStockModalClose = document.getElementById('addStockModalClose');
 const addStockForm = document.getElementById('addStockForm');
@@ -683,6 +684,51 @@ if (refreshBtn) {
     refreshBtn.addEventListener('click', () => {
         fullDataCache = null; // This only affects server-side, but signal intent
         fetchStockData();
+    });
+}
+
+// Export to Excel (CSV)
+if (exportExcelBtn) {
+    exportExcelBtn.addEventListener('click', () => {
+        const stocks = getFilteredAndSortedStocks();
+        if (stocks.length === 0) return;
+
+        const headers = [
+            'Ticker', 'Name', 'Sector', 'Cap', 'Market Cap ($)', 'P/E', 
+            'Current Price ($)', 'Previous Close ($)', 'All-Time High ($)', 
+            '% From ATH', 'Below 200 DMA', '5Y CAGR (%)', '10Y CAGR (%)'
+        ];
+        
+        let csvContent = headers.join(',') + '\n';
+        
+        stocks.forEach(stock => {
+            const row = [
+                stock.ticker,
+                `"${stock.name.replace(/"/g, '""')}"`,
+                stock.sector,
+                stock.cap,
+                stock.mcap,
+                stock.pe || '',
+                stock.price,
+                stock.previousClose || '',
+                stock.ath,
+                stock.drawdown ? stock.drawdown.toFixed(2) : '0',
+                stock.below200DMA === true ? 'Yes' : (stock.below200DMA === false ? 'No' : ''),
+                stock.cagr5Y !== null && !isNaN(stock.cagr5Y) ? stock.cagr5Y.toFixed(2) : '',
+                stock.cagr10Y !== null && !isNaN(stock.cagr10Y) ? stock.cagr10Y.toFixed(2) : ''
+            ];
+            csvContent += row.join(',') + '\n';
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'stockpulse_data.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
 }
 

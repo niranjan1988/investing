@@ -66,7 +66,23 @@
     "RDDT",
     "ALAB",
     "CRDO",
-    "HRMY"
+    "HRMY",
+    "HCA",
+    "TMDX",
+    "RBRK",
+    "AXON",
+    "NBIS",
+    "IREN",
+    "SOFI",
+    "IONQ",
+    "CLPT",
+    "VKTX",
+    "OSCR",
+    "CPRT",
+    "TEM",
+    "SPGI",
+    "QQQ",
+    "SOXX"
   ],
   "universe": [
     {
@@ -75,10 +91,6 @@
     },
     {
       "ticker": "AAPL",
-      "sector": "Technology"
-    },
-    {
-      "ticker": "GOOGL",
       "sector": "Technology"
     },
     {
@@ -420,11 +432,122 @@
     {
       "ticker": "IRMD",
       "sector": "Healthcare"
+    },
+    {
+      "ticker": "HCA",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "UNH",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "TMDX",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "RBRK",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AXON",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "NBIS",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "IREN",
+      "sector": "Financial Services"
+    },
+    {
+      "ticker": "SOFI",
+      "sector": "Financial Services"
+    },
+    {
+      "ticker": "IONQ",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "CLPT",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "VKTX",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "OSCR",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "CPRT",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "TEM",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "EVVTY",
+      "sector": "Consumer Cyclical"
+    },
+    {
+      "ticker": "SPGI",
+      "sector": "Financial Services"
+    },
+    {
+      "ticker": "IHAK",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "QQQ",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "IJR",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "SOXX",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "IVV",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "UAE",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "XLV",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "BITO",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "IBIT",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "IGV",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "IAUM",
+      "sector": "ETF"
+    },
+    {
+      "ticker": "IWM",
+      "sector": "ETF"
     }
   ],
   "shortlisted": [
     "NVDA",
-    "GOOGL",
     "MSFT",
     "AMZN",
     "TSM",
