@@ -345,7 +345,7 @@ function renderTable() {
         const tickerDecoration = isShortlisted ? '<span style="color: var(--yellow-400); margin-right: 4px;">★</span>' : '';
 
         return `
-            <tr data-ticker="${stock.ticker}" onclick="openModal('${stock.ticker}')">
+            <tr data-ticker="${stock.ticker}" onclick="openTradingViewPanel('${stock.ticker}')">
                 <td class="col-rank"><span class="rank-num">${index + 1}</span></td>
                 <td class="col-stock">
                     <div class="stock-info">
@@ -353,15 +353,15 @@ function renderTable() {
                             ${stock.ticker.substring(0, 3)}
                         </div>
                         <div class="stock-details">
-                            <span class="stock-ticker">${tickerDecoration}${stock.ticker}</span>
+                            <span class="stock-ticker" onclick="event.stopPropagation(); openModal('${stock.ticker}')" style="cursor: pointer;">${tickerDecoration}${stock.ticker}</span>
                             <div class="stock-name-row">
-                                <span class="stock-name">${stock.name}</span>
-                                <a href="https://www.tradingview.com/chart/?symbol=${stock.ticker}" target="_blank" class="tv-btn" onclick="event.stopPropagation()" aria-label="Open in TradingView" title="Open in TradingView">
+                                <span class="stock-name" onclick="event.stopPropagation(); openModal('${stock.ticker}')" style="cursor: pointer;">${stock.name}</span>
+                                <button type="button" class="tv-btn" onclick="event.stopPropagation(); openTradingViewPanel('${stock.ticker}')" aria-label="Open in TradingView" title="Open in TradingView" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit;">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="7" y1="17" x2="17" y2="7"></line>
                                         <polyline points="7 7 17 7 17 17"></polyline>
                                     </svg>
-                                </a>
+                                </button>
                                 <button type="button" class="tv-btn" onclick="openSipModalForStock(event, '${stock.ticker}')" aria-label="Calculate SIP" title="Calculate SIP" style="background: none; border: none; padding: 0; cursor: pointer;">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -583,6 +583,47 @@ function closeModal() {
 }
 
 // ============================================
+// Chart Panel (TradingView Split View)
+// ============================================
+function openTradingViewPanel(ticker) {
+    const dashboardRight = document.getElementById('dashboardRight');
+    const chartPanelBody = document.getElementById('chartPanelBody');
+    const chartPanelTitle = document.getElementById('chartPanelTitle');
+    
+    // Set title
+    chartPanelTitle.textContent = `${ticker} - TradingView`;
+    
+    // Get current theme
+    const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    
+    // Create widget iframe
+    // TradingView Lightweight widget embed
+    chartPanelBody.innerHTML = `
+        <iframe 
+            src="https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&theme=${currentTheme}&style=1" 
+            width="100%" 
+            height="100%" 
+            frameborder="0" 
+            allowtransparency="true" 
+            scrolling="no"
+            style="border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+        </iframe>
+    `;
+    
+    // Show panel
+    dashboardRight.style.display = 'flex';
+}
+
+function closeTradingViewPanel() {
+    const dashboardRight = document.getElementById('dashboardRight');
+    const chartPanelBody = document.getElementById('chartPanelBody');
+    dashboardRight.style.display = 'none';
+    chartPanelBody.innerHTML = '';
+}
+
+window.openTradingViewPanel = openTradingViewPanel;
+
+// ============================================
 // Event Listeners
 // ============================================
 
@@ -677,6 +718,12 @@ modalClose.addEventListener('click', closeModal);
 modalOverlay.addEventListener('click', (e) => {
     if (e.target === modalOverlay) closeModal();
 });
+
+// Chart Panel
+const closeChartPanelBtn = document.getElementById('closeChartPanelBtn');
+if (closeChartPanelBtn) {
+    closeChartPanelBtn.addEventListener('click', closeTradingViewPanel);
+}
 
 // Refresh button
 const refreshBtn = document.getElementById('refreshBtn');
@@ -1024,12 +1071,19 @@ function initTheme() {
 
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('stockpulse-theme', 'dark');
-    } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('stockpulse-theme', 'light');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('stockpulse-theme', newTheme);
+    
+    // Update TradingView widget if open
+    const chartPanelTitle = document.getElementById('chartPanelTitle');
+    const dashboardRight = document.getElementById('dashboardRight');
+    if (chartPanelTitle && chartPanelTitle.textContent && dashboardRight && dashboardRight.style.display !== 'none') {
+        const ticker = chartPanelTitle.textContent.split(' - ')[0];
+        if (ticker) {
+            openTradingViewPanel(ticker);
+        }
     }
 }
 

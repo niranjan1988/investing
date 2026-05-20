@@ -48,6 +48,13 @@
                     </button>
                     <kbd class="search-shortcut">⌘K</kbd>
                 </div>
+                <div class="header-stats">
+                    <div class="header-stat"><span class="header-stat-label">Total</span><span class="header-stat-value" id="totalStocksValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">ATH</span><span class="header-stat-value green" id="athCountValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">Near ATH</span><span class="header-stat-value yellow" id="nearAthValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">Deep Drop</span><span class="header-stat-value red" id="deepDrawdownValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">Avg Drop</span><span class="header-stat-value accent" id="avgDrawdownValue">0%</span></div>
+                </div>
             </div>
             <div class="header-right">
                 <div class="market-status" id="marketStatus">
@@ -104,73 +111,13 @@
             </div>
         </header>
 
-        <!-- Summary Cards -->
-        <section class="summary-section">
-            <div class="summary-card" id="totalStocksCard">
-                <div class="summary-icon stocks-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                        <path d="M16 3h-8l-2 4h12z"></path>
-                    </svg>
-                </div>
-                <div class="summary-info">
-                    <span class="summary-label">Total Stocks</span>
-                    <span class="summary-value" id="totalStocksValue">0</span>
-                </div>
-            </div>
-            <div class="summary-card" id="athCard">
-                <div class="summary-icon ath-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                        <polyline points="17 6 23 6 23 12"></polyline>
-                    </svg>
-                </div>
-                <div class="summary-info">
-                    <span class="summary-label">At ATH</span>
-                    <span class="summary-value green" id="athCountValue">0</span>
-                </div>
-            </div>
-            <div class="summary-card" id="nearAthCard">
-                <div class="summary-icon near-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                </div>
-                <div class="summary-info">
-                    <span class="summary-label">Near ATH (&lt;5%)</span>
-                    <span class="summary-value yellow" id="nearAthValue">0</span>
-                </div>
-            </div>
-            <div class="summary-card" id="deepDrawdownCard">
-                <div class="summary-icon deep-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
-                        <polyline points="17 18 23 18 23 12"></polyline>
-                    </svg>
-                </div>
-                <div class="summary-info">
-                    <span class="summary-label">Deep Drawdown (&gt;20%)</span>
-                    <span class="summary-value red" id="deepDrawdownValue">0</span>
-                </div>
-            </div>
-            <div class="summary-card" id="avgDrawdownCard">
-                <div class="summary-icon avg-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                        <line x1="6" y1="20" x2="6" y2="14"></line>
-                    </svg>
-                </div>
-                <div class="summary-info">
-                    <span class="summary-label">Avg Drawdown</span>
-                    <span class="summary-value" id="avgDrawdownValue">0%</span>
-                </div>
-            </div>
-        </section>
 
-        <!-- Filter & Sort Controls -->
-        <section class="controls-section">
+
+        <!-- Main Content Split Layout -->
+        <div class="dashboard-layout" id="dashboardLayout">
+            <div class="dashboard-left" id="dashboardLeft">
+                <!-- Filter & Sort Controls -->
+                <section class="controls-section">
             <div class="filter-group" id="filterGroupPrimary">
                 <button class="filter-btn active" data-filter="all" id="filterAll">All</button>
                 <button class="filter-btn" data-filter="shortlisted" id="filterShortlisted">Shortlisted</button>
@@ -235,6 +182,23 @@
                 <p>No stocks match your search</p>
             </div>
         </section>
+            </div> <!-- End dashboard-left -->
+            
+            <div class="dashboard-right" id="dashboardRight" style="display: none;">
+                <div class="chart-panel-header">
+                    <h3 id="chartPanelTitle">TradingView</h3>
+                    <button class="close-chart-btn" id="closeChartPanelBtn" aria-label="Close chart">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="chart-panel-body" id="chartPanelBody">
+                    <!-- iframe injected here by JS -->
+                </div>
+            </div>
+        </div> <!-- End dashboard-layout -->
 
         <!-- Footer -->
         <footer class="app-footer">
