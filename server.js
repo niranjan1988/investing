@@ -185,44 +185,61 @@ async function fetchATH(ticker) {
 
     const yahooTicker = toYahooTicker(ticker);
     try {
-        const url = `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=max&interval=1mo`;
-        const response = await fetch(url, {
-            headers: { 'User-Agent': YAHOO_UA },
-        });
+        const urlMax = `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=max&interval=1mo`;
+        const url6mo = `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=6mo&interval=1d`;
 
-        if (!response.ok) {
-            console.warn(`[Yahoo] Chart ${response.status} for ${ticker}`);
-            return null;
+        const [resMax, res6mo] = await Promise.all([
+            fetch(urlMax, { headers: { 'User-Agent': YAHOO_UA } }),
+            fetch(url6mo, { headers: { 'User-Agent': YAHOO_UA } })
+        ]);
+
+        let ath = 0;
+        let past1Y = null, past3Y = null, past5Y = null, past10Y = null;
+        let ma100 = null;
+
+        if (resMax.ok) {
+            const data = await resMax.json();
+            const result = data?.chart?.result?.[0];
+            if (result) {
+                const highs = result.indicators?.quote?.[0]?.high || [];
+                const validHighs = highs.filter(h => h != null && !isNaN(h));
+                if (validHighs.length > 0) {
+                    ath = Math.max(...validHighs);
+                }
+                const timestamps = result.timestamp || [];
+                const closes = result.indicators?.quote?.[0]?.close || [];
+                past1Y = getPriceAtYearsAgo(timestamps, closes, 1);
+                past3Y = getPriceAtYearsAgo(timestamps, closes, 3);
+                past5Y = getPriceAtYearsAgo(timestamps, closes, 5);
+                past10Y = getPriceAtYearsAgo(timestamps, closes, 10);
+                const currentPrice = result.meta?.regularMarketPrice ?? 0;
+                ath = Math.max(ath, currentPrice);
+            }
+        } else {
+            console.warn(`[Yahoo] Max chart fetch failed with status ${resMax.status} for ${ticker}`);
         }
 
-        const data = await response.json();
-        const result = data?.chart?.result?.[0];
-        if (!result) return null;
+        if (res6mo.ok) {
+            const data = await res6mo.json();
+            const result = data?.chart?.result?.[0];
+            if (result) {
+                const closes = result.indicators?.quote?.[0]?.close || [];
+                const validCloses = closes.filter(c => c != null && !isNaN(c));
+                if (validCloses.length >= 100) {
+                    const slice = validCloses.slice(-100);
+                    const sum = slice.reduce((a, b) => a + b, 0);
+                    ma100 = sum / 100;
+                }
+            }
+        } else {
+            console.warn(`[Yahoo] 6mo chart fetch failed with status ${res6mo.status} for ${ticker}`);
+        }
 
-        const highs = result.indicators?.quote?.[0]?.high || [];
-        const validHighs = highs.filter(h => h != null && !isNaN(h));
-        if (validHighs.length === 0) return null;
-
-        let ath = Math.max(...validHighs);
-
-        const timestamps = result.timestamp || [];
-        const closes = result.indicators?.quote?.[0]?.close || [];
-
-        const past1Y = getPriceAtYearsAgo(timestamps, closes, 1);
-        const past3Y = getPriceAtYearsAgo(timestamps, closes, 3);
-        const past5Y = getPriceAtYearsAgo(timestamps, closes, 5);
-        const past10Y = getPriceAtYearsAgo(timestamps, closes, 10);
-
-        // Check if current price exceeds monthly bar highs
-        const currentPrice = result.meta?.regularMarketPrice ?? 0;
-        ath = Math.max(ath, currentPrice);
-
-        // Cache
-        const dataObj = { value: ath, past1Y, past3Y, past5Y, past10Y, time: Date.now() };
+        const dataObj = { value: ath, past1Y, past3Y, past5Y, past10Y, ma100, time: Date.now() };
         athCache[ticker] = dataObj;
         return dataObj;
     } catch (err) {
-        console.error(`[Yahoo] ATH error for ${ticker}:`, err.message);
+        console.error(`[Yahoo] ATH/MA100 error for ${ticker}:`, err.message);
         return null;
     }
 }
@@ -286,6 +303,7 @@ app.get('/api/stocks', async (req, res) => {
             const past3Y = chartData.past3Y;
             const past5Y = chartData.past5Y;
             const past10Y = chartData.past10Y;
+            const ma100 = chartData.ma100;
 
             // Use chart ATH if available, otherwise fall back to 52-week high
             const ath = chartATH || quote.fiftyTwoWeekHigh || 0;
@@ -311,6 +329,8 @@ app.get('/api/stocks', async (req, res) => {
                 pe: quote.pe ? Math.round(quote.pe * 100) / 100 : null,
                 ath: Math.round(finalATH * 100) / 100,
                 below200DMA: quote.twoHundredDayAverage ? (price < quote.twoHundredDayAverage) : null,
+                ma200: quote.twoHundredDayAverage ? Math.round(quote.twoHundredDayAverage * 100) / 100 : null,
+                ma100: ma100 ? (Math.round(ma100 * 100) / 100) : null,
                 cagr1Y: computeCAGR(price, past1Y, 1),
                 cagr3Y: computeCAGR(price, past3Y, 3),
                 cagr5Y: computeCAGR(price, past5Y, 5),

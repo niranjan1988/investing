@@ -761,6 +761,8 @@ body::before {
 .col-mcap,
 .col-price,
 .col-ath,
+.col-ma100,
+.col-dma,
 .col-cagr {
     text-align: right !important;
     min-width: 95px;
@@ -775,10 +777,7 @@ body::before {
     width: 100px;
 }
 
-.col-dma {
-    text-align: center !important;
-    min-width: 80px;
-}
+/* col-dma styling merged with right-aligned columns */
 
 /* Cell Content Styles */
 .rank-num {

@@ -215,11 +215,18 @@ function getFilteredAndSortedStocks() {
         case 'deep':
             stocks = stocks.filter(s => s.drawdown > 20);
             break;
+        case 'below100dma':
+            stocks = stocks.filter(s => s.ma100 && s.price < s.ma100);
+            break;
         case 'below200dma':
             stocks = stocks.filter(s => s.below200DMA === true);
             break;
         case 'shortlisted':
             stocks = stocks.filter(s => shortlistedStocks.includes(s.ticker));
+            break;
+        case 'm7':
+            const m7Tickers = ['AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'NVDA', 'META', 'TSLA'];
+            stocks = stocks.filter(s => m7Tickers.includes(s.ticker));
             break;
         default:
             if (currentFilter.startsWith('sector:')) {
@@ -293,7 +300,8 @@ function renderFilters() {
     }
 
     let html = `<button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all" id="filterAll">All</button>`;
-    
+    html += `<button class="filter-btn ${currentFilter === 'm7' ? 'active' : ''}" data-filter="m7" id="filterM7">M7</button>`;
+
     sectors.forEach(sector => {
         const filterVal = 'sector:' + sector;
         const isActive = currentFilter === filterVal;
@@ -356,7 +364,7 @@ function renderTable() {
                             <span class="stock-ticker" onclick="event.stopPropagation(); openModal('${stock.ticker}')" style="cursor: pointer;">${tickerDecoration}${stock.ticker}</span>
                             <div class="stock-name-row">
                                 <span class="stock-name" onclick="event.stopPropagation(); openModal('${stock.ticker}')" style="cursor: pointer;">${stock.name}</span>
-                                <button type="button" class="tv-btn" onclick="event.stopPropagation(); openTradingViewPanel('${stock.ticker}')" aria-label="Open in TradingView" title="Open in TradingView" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit;">
+                                <button type="button" class="tv-btn" onclick="event.stopPropagation(); window.open('https://www.tradingview.com/chart/?symbol=${stock.ticker}', '_blank')" aria-label="Open in TradingView" title="Open in TradingView" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit;">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="7" y1="17" x2="17" y2="7"></line>
                                         <polyline points="7 7 17 7 17 17"></polyline>
@@ -392,9 +400,14 @@ function renderTable() {
                         ${drawdown <= 0 ? '🟢 ATH' : '-' + drawdown.toFixed(2) + '%'}
                     </span>
                 </td>
-                <td class="col-dma" style="text-align: center;">
-                    <span class="dma-cell ${stock.below200DMA === true ? 'price-down' : (stock.below200DMA === false ? 'price-up' : '')}">
-                        ${stock.below200DMA === true ? 'Yes' : (stock.below200DMA === false ? 'No' : '—')}
+                <td class="col-ma100" style="text-align: right;">
+                    <span class="ma100-cell ${stock.ma100 ? (stock.price >= stock.ma100 ? 'price-up' : 'price-down') : ''}">
+                        ${stock.ma100 ? formatPrice(stock.ma100) : '—'}
+                    </span>
+                </td>
+                <td class="col-dma" style="text-align: right;">
+                    <span class="dma-cell ${stock.ma200 ? (stock.price >= stock.ma200 ? 'price-up' : 'price-down') : ''}">
+                        ${stock.ma200 ? formatPrice(stock.ma200) : '—'}
                     </span>
                 </td>
                 <td class="col-cagr">
@@ -406,11 +419,6 @@ function renderTable() {
                     <span class="cagr-cell ${stock.cagr10Y === null ? '' : (stock.cagr10Y >= 0 ? 'cagr-pos' : 'cagr-neg')}">
                         ${stock.cagr10Y === null || isNaN(stock.cagr10Y) ? '—' : (stock.cagr10Y >= 0 ? '+' : '') + stock.cagr10Y.toFixed(2) + '%'}
                     </span>
-                </td>
-                <td class="col-bar">
-                    <div class="drawdown-bar">
-                        <div class="drawdown-bar-fill level-${level}" style="width:${drawdown <= 0 ? 100 : Math.max(100 - barWidth, 5)}%"></div>
-                    </div>
                 </td>
             </tr>
         `;
@@ -589,13 +597,13 @@ function openTradingViewPanel(ticker) {
     const dashboardRight = document.getElementById('dashboardRight');
     const chartPanelBody = document.getElementById('chartPanelBody');
     const chartPanelTitle = document.getElementById('chartPanelTitle');
-    
+
     // Set title with a link to the full chart
     chartPanelTitle.innerHTML = `${ticker} - TradingView <a href="https://www.tradingview.com/chart/?symbol=${ticker}" target="_blank" title="Open full chart for Financial Indicators" style="margin-left: 10px; font-size: 0.8rem; color: var(--accent); text-decoration: underline; text-underline-offset: 2px;">↗ Open Full Chart</a>`;
-    
+
     // Get current theme
     const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-    
+
     // Create widget iframe
     // TradingView Lightweight widget embed
     chartPanelBody.innerHTML = `
@@ -609,7 +617,7 @@ function openTradingViewPanel(ticker) {
             style="border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
         </iframe>
     `;
-    
+
     // Show panel
     dashboardRight.style.display = 'flex';
 }
@@ -662,13 +670,13 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         searchInput.focus();
     }
-    
+
     // Alt+A to open Add Stock modal
     if (e.altKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();
         if (typeof addStockBtn !== 'undefined' && addStockBtn) addStockBtn.click();
     }
-    
+
     // Alt+S to open SIP Calculator
     if (e.altKey && e.key.toLowerCase() === 's') {
         const sipCalcBtn = document.getElementById('sipCalcBtn');
@@ -741,13 +749,13 @@ if (exportExcelBtn) {
         if (stocks.length === 0) return;
 
         const headers = [
-            'Ticker', 'Name', 'Sector', 'Cap', 'Market Cap ($)', 'P/E', 
-            'Current Price ($)', 'Previous Close ($)', 'All-Time High ($)', 
-            '% From ATH', 'Below 200 DMA', '5Y CAGR (%)', '10Y CAGR (%)'
+            'Ticker', 'Name', 'Sector', 'Cap', 'Market Cap ($)', 'P/E',
+            'Current Price ($)', 'Previous Close ($)', '100 Day MA ($)', '200 Day MA ($)',
+            'All-Time High ($)', '% From ATH', '5Y CAGR (%)', '10Y CAGR (%)'
         ];
-        
+
         let csvContent = headers.join(',') + '\n';
-        
+
         stocks.forEach(stock => {
             const row = [
                 stock.ticker,
@@ -758,9 +766,10 @@ if (exportExcelBtn) {
                 stock.pe || '',
                 stock.price,
                 stock.previousClose || '',
+                stock.ma100 || '',
+                stock.ma200 || '',
                 stock.ath,
                 stock.drawdown ? stock.drawdown.toFixed(2) : '0',
-                stock.below200DMA === true ? 'Yes' : (stock.below200DMA === false ? 'No' : ''),
                 stock.cagr5Y !== null && !isNaN(stock.cagr5Y) ? stock.cagr5Y.toFixed(2) : '',
                 stock.cagr10Y !== null && !isNaN(stock.cagr10Y) ? stock.cagr10Y.toFixed(2) : ''
             ];
@@ -892,12 +901,12 @@ async function loadDeactivatedStocks() {
 
 function renderDeactivatedStocks() {
     deactivatedList.innerHTML = '';
-    
+
     let stocksToRender = allDeactivatedStocks;
     if (deactivatedSearchQuery) {
         const q = deactivatedSearchQuery.toLowerCase();
-        stocksToRender = stocksToRender.filter(s => 
-            s.ticker.toLowerCase().includes(q) || 
+        stocksToRender = stocksToRender.filter(s =>
+            s.ticker.toLowerCase().includes(q) ||
             s.sector.toLowerCase().includes(q)
         );
     }
@@ -1072,10 +1081,10 @@ function initTheme() {
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    
+
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('stockpulse-theme', newTheme);
-    
+
     // Update TradingView widget if open
     const chartPanelTitle = document.getElementById('chartPanelTitle');
     const dashboardRight = document.getElementById('dashboardRight');
@@ -1112,7 +1121,7 @@ const sipCagr = document.getElementById('sipCagr');
 const sipLoading = document.getElementById('sipLoading');
 const sipError = document.getElementById('sipError');
 
-window.openSipModal = function(ticker = null) {
+window.openSipModal = function (ticker = null) {
     // Populate stocks dropdown
     sipStockSelect.innerHTML = '';
     const sortedStocks = [...stocksData].sort((a, b) => a.ticker.localeCompare(b.ticker));
@@ -1128,7 +1137,7 @@ window.openSipModal = function(ticker = null) {
             sipStockSelect.appendChild(opt);
         });
     }
-    
+
     // Reset results area
     sipResultsContainer.style.display = 'none';
     sipError.style.display = 'none';
@@ -1138,7 +1147,7 @@ window.openSipModal = function(ticker = null) {
     document.body.style.overflow = 'hidden';
 };
 
-window.openSipModalForStock = function(event, ticker) {
+window.openSipModalForStock = function (event, ticker) {
     event.stopPropagation();
     window.openSipModal(ticker);
 };
@@ -1177,7 +1186,7 @@ if (calculateSipBtn) {
 
             sipInvested.textContent = '$' + data.invested.toLocaleString();
             sipFinalValue.textContent = '$' + data.finalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            
+
             const cagrColor = data.cagr >= 0 ? 'var(--green-500)' : 'var(--red-400)';
             sipCagr.innerHTML = `<span style="color: ${cagrColor}">${data.cagr >= 0 ? '+' : ''}${data.cagr.toFixed(2)}%</span>`;
 

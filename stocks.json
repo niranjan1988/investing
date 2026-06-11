@@ -46,7 +46,6 @@
     "UI",
     "IDXX",
     "TER",
-    "GRMN",
     "ARGX",
     "DXCM",
     "UTHR",
@@ -60,7 +59,6 @@
     "CPRX",
     "SEZL",
     "AUPH",
-    "INVA",
     "IRMD",
     "GOOG",
     "RDDT",
@@ -82,7 +80,9 @@
     "TEM",
     "SPGI",
     "QQQ",
-    "SOXX"
+    "SOXX",
+    "AAPL",
+    "VEEV"
   ],
   "universe": [
     {
@@ -544,6 +544,10 @@
     {
       "ticker": "IWM",
       "sector": "ETF"
+    },
+    {
+      "ticker": "VEEV",
+      "sector": "Healthcare"
     }
   ],
   "shortlisted": [
@@ -562,21 +566,12 @@
     "ADBE",
     "FTNT",
     "RMBS",
-    "PCTY",
     "ISRG",
-    "IDXX",
-    "IRMD",
     "NFLX",
     "PLTR",
     "ANET",
     "PANW",
     "MPWR",
-    "ADSK",
-    "UI",
-    "RDDT",
-    "PTC",
-    "APPF",
-    "CLBT",
     "CRDO",
     "ALAB",
     "UTHR",
@@ -586,8 +581,6 @@
     "CDNS",
     "CRWD",
     "TSLA",
-    "AMD",
-    "DXCM",
-    "HRMY"
+    "AMD"
   ]
 }

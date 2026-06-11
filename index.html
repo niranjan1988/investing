@@ -49,11 +49,16 @@
                     <kbd class="search-shortcut">⌘K</kbd>
                 </div>
                 <div class="header-stats">
-                    <div class="header-stat"><span class="header-stat-label">Total</span><span class="header-stat-value" id="totalStocksValue">0</span></div>
-                    <div class="header-stat"><span class="header-stat-label">ATH</span><span class="header-stat-value green" id="athCountValue">0</span></div>
-                    <div class="header-stat"><span class="header-stat-label">Near ATH</span><span class="header-stat-value yellow" id="nearAthValue">0</span></div>
-                    <div class="header-stat"><span class="header-stat-label">Deep Drop</span><span class="header-stat-value red" id="deepDrawdownValue">0</span></div>
-                    <div class="header-stat"><span class="header-stat-label">Avg Drop</span><span class="header-stat-value accent" id="avgDrawdownValue">0%</span></div>
+                    <div class="header-stat"><span class="header-stat-label">Total</span><span class="header-stat-value"
+                            id="totalStocksValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">ATH</span><span
+                            class="header-stat-value green" id="athCountValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">Near ATH</span><span
+                            class="header-stat-value yellow" id="nearAthValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">Deep Drop</span><span
+                            class="header-stat-value red" id="deepDrawdownValue">0</span></div>
+                    <div class="header-stat"><span class="header-stat-label">Avg Drop</span><span
+                            class="header-stat-value accent" id="avgDrawdownValue">0%</span></div>
                 </div>
             </div>
             <div class="header-right">
@@ -98,7 +103,8 @@
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                 </button>
-                <button class="theme-toggle" id="exportExcelBtn" title="Download as Excel" aria-label="Download as Excel">
+                <button class="theme-toggle" id="exportExcelBtn" title="Download as Excel"
+                    aria-label="Download as Excel">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -118,72 +124,77 @@
             <div class="dashboard-left" id="dashboardLeft">
                 <!-- Filter & Sort Controls -->
                 <section class="controls-section">
-            <div class="filter-group" id="filterGroupPrimary">
-                <button class="filter-btn active" data-filter="all" id="filterAll">All</button>
-                <button class="filter-btn" data-filter="shortlisted" id="filterShortlisted">Shortlisted</button>
-            </div>
-            <div class="filter-group">
-                <button class="filter-btn" data-filter="ath" id="filterAth">At ATH</button>
-                <button class="filter-btn" data-filter="near" id="filterNear">Near ATH</button>
-                <button class="filter-btn" data-filter="deep" id="filterDeep">Deep Drawdown</button>
-                <button class="filter-btn" data-filter="below200dma" id="filterBelow200DMA">Below 200 DMA</button>
-            </div>
-            <div class="sort-group">
-                <label class="sort-label">Sort by:</label>
-                <select id="sortSelect" class="sort-select">
-                    <option value="marketcap">Market Cap</option>
-                    <option value="drawdown">% From ATH</option>
-                    <option value="cagr5Y">5Y CAGR</option>
-                    <option value="cagr10Y">10Y CAGR</option>
-                    <option value="name">Name</option>
-                    <option value="sector">Sector</option>
-                    <option value="price">Price</option>
-                </select>
-                <button class="sort-order-btn" id="sortOrderBtn" title="Toggle sort order">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 5v14M5 12l7-7 7 7" />
-                    </svg>
-                </button>
-            </div>
-        </section>
+                    <div class="filter-group" id="filterGroupPrimary">
+                        <button class="filter-btn active" data-filter="all" id="filterAll">All</button>
+                        <button class="filter-btn" data-filter="m7" id="filterM7">M7</button>
+                        <button class="filter-btn" data-filter="shortlisted" id="filterShortlisted">Shortlisted</button>
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn" data-filter="ath" id="filterAth">At ATH</button>
+                        <button class="filter-btn" data-filter="near" id="filterNear">Near ATH</button>
+                        <button class="filter-btn" data-filter="deep" id="filterDeep">Deep Drawdown</button>
+                        <button class="filter-btn" data-filter="below100dma" id="filterBelow100DMA">Below 100 DMA</button>
+                        <button class="filter-btn" data-filter="below200dma" id="filterBelow200DMA">Below 200 DMA</button>
+                    </div>
+                    <div class="sort-group">
+                        <label class="sort-label">Sort by:</label>
+                        <select id="sortSelect" class="sort-select">
+                            <option value="marketcap">Market Cap</option>
+                            <option value="drawdown">% From ATH</option>
+                            <option value="cagr5Y">5Y CAGR</option>
+                            <option value="cagr10Y">10Y CAGR</option>
+                            <option value="name">Name</option>
+                            <option value="sector">Sector</option>
+                            <option value="price">Price</option>
+                        </select>
+                        <button class="sort-order-btn" id="sortOrderBtn" title="Toggle sort order">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12l7-7 7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </section>
 
 
-        <!-- Stock Table -->
-        <section class="table-section">
-            <div class="table-container">
-                <table class="stock-table" id="stockTable">
-                    <thead>
-                        <tr>
-                            <th class="col-rank">#</th>
-                            <th class="col-stock">Stock</th>
-                            <th class="col-sector">Sector</th>
-                            <th class="col-cap">Cap</th>
-                            <th class="col-mcap">Market Cap <span style="color: var(--text-dim); font-size: 0.9em; text-transform: none;">(P/E)</span></th>
-                            <th class="col-price">Current Price</th>
-                            <th class="col-ath">All-Time High</th>
-                            <th class="col-drawdown">% From ATH</th>
-                            <th class="col-dma">Below 200 DMA</th>
-                            <th class="col-cagr">5Y CAGR</th>
-                            <th class="col-cagr">10Y CAGR</th>
-                            <th class="col-bar">Drawdown</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stockTableBody">
-                        <!-- Rows populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="no-results" id="noResults" style="display:none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    <line x1="8" y1="11" x2="14" y2="11"></line>
-                </svg>
-                <p>No stocks match your search</p>
-            </div>
-        </section>
+                <!-- Stock Table -->
+                <section class="table-section">
+                    <div class="table-container">
+                        <table class="stock-table" id="stockTable">
+                            <thead>
+                                <tr>
+                                    <th class="col-rank">#</th>
+                                    <th class="col-stock">Stock</th>
+                                    <th class="col-sector">Sector</th>
+                                    <th class="col-cap">Cap</th>
+                                    <th class="col-mcap">Market Cap <span
+                                            style="color: var(--text-dim); font-size: 0.9em; text-transform: none;">(P/E)</span>
+                                    </th>
+                                    <th class="col-price">Current Price</th>
+                                    <th class="col-ath">All-Time High</th>
+                                    <th class="col-drawdown">% From ATH</th>
+                                    <th class="col-ma100">100 Day MA</th>
+                                    <th class="col-dma">200 Day MA</th>
+                                    <th class="col-cagr">5Y CAGR</th>
+                                    <th class="col-cagr">10Y CAGR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stockTableBody">
+                                <!-- Rows populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="no-results" id="noResults" style="display:none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48"
+                            height="48">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                        <p>No stocks match your search</p>
+                    </div>
+                </section>
             </div> <!-- End dashboard-left -->
-            
+
             <div class="dashboard-right" id="dashboardRight" style="display: none;">
                 <div class="chart-panel-header">
                     <h3 id="chartPanelTitle">TradingView</h3>
@@ -279,7 +290,8 @@
                         <span class="detail-label">Market Cap</span>
                         <div style="display: flex; gap: 8px; align-items: baseline;">
                             <span class="detail-value" id="modalMcap"></span>
-                            <span id="modalPe" style="font-size: 0.85em; color: var(--text-muted); font-weight: 500;"></span>
+                            <span id="modalPe"
+                                style="font-size: 0.85em; color: var(--text-muted); font-weight: 500;"></span>
                         </div>
                     </div>
                     <div class="detail-row">
@@ -331,7 +343,8 @@
                     Deactivated Stocks</div>
             </div>
             <div style="margin-bottom: 15px; padding: 0 20px;">
-                <input type="text" id="deactivatedSearchInput" placeholder="Search deactivated stocks..." style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                <input type="text" id="deactivatedSearchInput" placeholder="Search deactivated stocks..."
+                    style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
             </div>
             <div class="modal-body">
                 <div id="deactivatedList" style="display: flex; flex-direction: column; gap: 10px;">
@@ -366,7 +379,9 @@
                             Symbols</label>
                         <input type="text" id="addTicker" required placeholder="e.g. AAPL, MSFT, GOOG"
                             style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
-                        <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 5px;">Separate multiple tickers with commas. Sector and Market Cap will be auto-fetched.</small>
+                        <small
+                            style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 5px;">Separate
+                            multiple tickers with commas. Sector and Market Cap will be auto-fetched.</small>
                     </div>
                     <button type="submit" id="submitAddStockBtn"
                         style="margin-top: 10px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: background 0.2s;">
@@ -387,56 +402,78 @@
                 </svg>
             </button>
             <div class="modal-header" style="margin-bottom: 20px;">
-                <div class="modal-name" style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">SIP Calculator</div>
+                <div class="modal-name" style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">SIP
+                    Calculator</div>
             </div>
             <div class="modal-body">
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
                     <div>
-                        <label for="sipStockSelect" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Select Stock</label>
-                        <select id="sipStockSelect" style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                        <label for="sipStockSelect"
+                            style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Select
+                            Stock</label>
+                        <select id="sipStockSelect"
+                            style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
                             <!-- Populated by JS -->
                         </select>
                     </div>
                     <div>
-                        <label for="sipDurationSelect" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Duration</label>
-                        <select id="sipDurationSelect" style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                        <label for="sipDurationSelect"
+                            style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Duration</label>
+                        <select id="sipDurationSelect"
+                            style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
                             <option value="3">3 Years</option>
                             <option value="5" selected>5 Years</option>
                             <option value="10">10 Years</option>
                         </select>
                     </div>
-                    <button id="calculateSipBtn" style="margin-top: 10px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: background 0.2s;">
+                    <button id="calculateSipBtn"
+                        style="margin-top: 10px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: background 0.2s;">
                         Calculate SIP
                     </button>
                 </div>
 
-                <div id="sipResultsContainer" style="display: none; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                <div id="sipResultsContainer"
+                    style="display: none; border-top: 1px solid var(--border-color); padding-top: 20px;">
                     <div style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-secondary);">
                         Based on <strong style="color:var(--text-primary)">$100</strong> invested every month.
                     </div>
                     <div class="modal-details" style="grid-template-columns: 1fr; gap: 10px;">
-                        <div class="detail-row" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--text-muted); display: flex; justify-content: space-between; align-items: center;">
+                        <div class="detail-row"
+                            style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--text-muted); display: flex; justify-content: space-between; align-items: center;">
                             <span class="detail-label" style="font-size: 1rem;">Total Invested Amount</span>
-                            <span class="detail-value" id="sipInvested" style="font-size: 1.1rem; font-weight: 700;"></span>
+                            <span class="detail-value" id="sipInvested"
+                                style="font-size: 1.1rem; font-weight: 700;"></span>
                         </div>
-                        <div class="detail-row" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center;">
+                        <div class="detail-row"
+                            style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center;">
                             <span class="detail-label" style="font-size: 1rem;">Final Amount as of Today</span>
-                            <span class="detail-value" id="sipFinalValue" style="font-size: 1.1rem; font-weight: 700;"></span>
+                            <span class="detail-value" id="sipFinalValue"
+                                style="font-size: 1.1rem; font-weight: 700;"></span>
                         </div>
-                        <div class="detail-row" style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--green-500); display: flex; justify-content: space-between; align-items: center;">
+                        <div class="detail-row"
+                            style="padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border-left: 4px solid var(--green-500); display: flex; justify-content: space-between; align-items: center;">
                             <span class="detail-label" style="font-size: 1rem;">SIP CAGR</span>
                             <span class="detail-value" id="sipCagr" style="font-size: 1.1rem; font-weight: 700;"></span>
                         </div>
                     </div>
-                    
-                    <div style="max-height: 250px; overflow-y: auto; margin-top: 20px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+
+                    <div
+                        style="max-height: 250px; overflow-y: auto; margin-top: 20px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
                         <table class="stock-table" style="margin: 0; font-size: 0.9rem;">
                             <thead style="position: sticky; top: 0; background: var(--bg-secondary); z-index: 1;">
                                 <tr>
-                                    <th style="padding: 10px; text-align: left; color: var(--text-muted); font-weight: 600;">Date</th>
-                                    <th style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">Invested Price</th>
-                                    <th style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">Current Price</th>
-                                    <th style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">Difference</th>
+                                    <th
+                                        style="padding: 10px; text-align: left; color: var(--text-muted); font-weight: 600;">
+                                        Date</th>
+                                    <th
+                                        style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">
+                                        Invested Price</th>
+                                    <th
+                                        style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">
+                                        Current Price</th>
+                                    <th
+                                        style="padding: 10px; text-align: right; color: var(--text-muted); font-weight: 600;">
+                                        Difference</th>
                                 </tr>
                             </thead>
                             <tbody id="sipTableBody">
@@ -444,10 +481,12 @@
                         </table>
                     </div>
                 </div>
-                <div id="sipLoading" style="display: none; padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                <div id="sipLoading"
+                    style="display: none; padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
                     Calculating historical returns...
                 </div>
-                <div id="sipError" style="display: none; padding: 15px; margin-top: 10px; background: rgba(239, 68, 68, 0.1); color: var(--red-400); border-radius: var(--radius-sm); font-size: 0.9rem; text-align: center;">
+                <div id="sipError"
+                    style="display: none; padding: 15px; margin-top: 10px; background: rgba(239, 68, 68, 0.1); color: var(--red-400); border-radius: var(--radius-sm); font-size: 0.9rem; text-align: center;">
                 </div>
             </div>
         </div>
