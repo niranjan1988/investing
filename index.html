@@ -122,8 +122,28 @@
         <!-- Main Content Split Layout -->
         <div class="dashboard-layout" id="dashboardLayout">
             <div class="dashboard-left" id="dashboardLeft">
-                <!-- Filter & Sort Controls -->
-                <section class="controls-section">
+                <div class="top-bar-container">
+                    <!-- Bucket Bar -->
+                    <div class="bucket-bar" id="bucketBar" style="display: none;">
+                        <span class="bucket-bar-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                                </path>
+                            </svg>
+                            Buckets
+                        </span>
+                        <div id="bucketPillsContainer" style="display: flex; gap: 8px; align-items: center;"></div>
+                        <button class="bucket-create-btn" id="openCreateBucketBtn" title="Create new bucket">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            New Bucket
+                        </button>
+                    </div>
+
+                    <!-- Filter & Sort Controls -->
+
                     <div class="filter-group" id="filterGroupPrimary">
                         <button class="filter-btn active" data-filter="all" id="filterAll">All</button>
                         <button class="filter-btn" data-filter="m7" id="filterM7">M7</button>
@@ -133,8 +153,10 @@
                         <button class="filter-btn" data-filter="ath" id="filterAth">At ATH</button>
                         <button class="filter-btn" data-filter="near" id="filterNear">Near ATH</button>
                         <button class="filter-btn" data-filter="deep" id="filterDeep">Deep Drawdown</button>
-                        <button class="filter-btn" data-filter="below100dma" id="filterBelow100DMA">Below 100 DMA</button>
-                        <button class="filter-btn" data-filter="below200dma" id="filterBelow200DMA">Below 200 DMA</button>
+                        <button class="filter-btn" data-filter="below100dma" id="filterBelow100DMA">Below 100
+                            DMA</button>
+                        <button class="filter-btn" data-filter="below200dma" id="filterBelow200DMA">Below 200
+                            DMA</button>
                     </div>
                     <div class="sort-group">
                         <label class="sort-label">Sort by:</label>
@@ -153,7 +175,8 @@
                             </svg>
                         </button>
                     </div>
-                </section>
+
+                </div>
 
 
                 <!-- Stock Table -->
@@ -251,6 +274,12 @@
                     style="margin-left: 10px; padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--red-400); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-family: var(--font-family); transition: all 0.2s;">
                     Deactivate
                 </button>
+            </div>
+            <div class="modal-bucket-section" id="modalBucketSection">
+                <div class="modal-bucket-label">Add to Bucket</div>
+                <div class="modal-bucket-chips" id="modalBucketChips">
+                    <!-- bucket chips injected by JS -->
+                </div>
             </div>
             <div class="modal-body">
                 <div class="modal-metrics">
@@ -488,6 +517,59 @@
                 <div id="sipError"
                     style="display: none; padding: 15px; margin-top: 10px; background: rgba(239, 68, 68, 0.1); color: var(--red-400); border-radius: var(--radius-sm); font-size: 0.9rem; text-align: center;">
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Bucket Dropdown -->
+    <div id="tableBucketDropdown" class="table-bucket-dropdown" style="display: none;">
+        <div class="dropdown-header">Add to Bucket</div>
+        <div class="dropdown-list" id="tableBucketDropdownList"></div>
+    </div>
+
+    <!-- Create Bucket Modal -->
+    <div class="create-bucket-modal-overlay" id="createBucketModalOverlay">
+        <div class="create-bucket-modal">
+            <button class="modal-close" id="createBucketModalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Create New Bucket
+            </h3>
+            <p>Group stocks by strategy, sector, or custom theme.</p>
+            <input type="text" id="newBucketNameInput" class="bucket-input"
+                placeholder="e.g. Dividend Kings, High Growth...">
+            <div class="bucket-actions">
+                <button class="bucket-btn-secondary" id="createBucketCancel">Cancel</button>
+                <button class="bucket-btn-primary" id="createBucketConfirm">Create Bucket</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bucket View Modal -->
+    <div class="bucket-view-modal-overlay" id="bucketViewModalOverlay">
+        <div class="bucket-view-modal">
+            <button class="modal-close" id="bucketViewModalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="bucket-view-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <h3 id="bucketViewTitle">Bucket Name</h3>
+                <span class="bucket-view-count" id="bucketViewCount">0 stocks</span>
+            </div>
+            <div class="bucket-view-list" id="bucketViewList">
+                <!-- items injected by JS -->
             </div>
         </div>
     </div>

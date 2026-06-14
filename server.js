@@ -31,6 +31,9 @@ function loadStocks() {
         if (!IN_MEMORY_STOCKS.shortlisted) {
             IN_MEMORY_STOCKS.shortlisted = [];
         }
+        if (!IN_MEMORY_STOCKS.buckets) {
+            IN_MEMORY_STOCKS.buckets = {};
+        }
     } catch (e) {
         console.error('Failed to load stocks.json', e);
     }
@@ -520,6 +523,83 @@ app.post('/api/shortlisted/toggle', (req, res) => {
 });
 
 // ============================================
+// Buckets API Endpoints
+// ============================================
+
+// Get all buckets
+app.get('/api/buckets', (req, res) => {
+    try {
+        res.json({ buckets: IN_MEMORY_STOCKS.buckets || {} });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to get buckets' });
+    }
+});
+
+// Create a new bucket
+app.post('/api/buckets/create', (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name || !name.trim()) {
+            return res.status(400).json({ error: 'Bucket name is required' });
+        }
+        const bucketName = name.trim();
+        if (IN_MEMORY_STOCKS.buckets[bucketName]) {
+            return res.status(400).json({ error: 'Bucket already exists' });
+        }
+        IN_MEMORY_STOCKS.buckets[bucketName] = [];
+        saveStocks();
+        res.json({ success: true, buckets: IN_MEMORY_STOCKS.buckets });
+    } catch (err) {
+        console.error('[API] Error creating bucket:', err.message);
+        res.status(500).json({ error: 'Failed to create bucket' });
+    }
+});
+
+// Delete a bucket
+app.post('/api/buckets/delete', (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name) {
+            return res.status(400).json({ error: 'Bucket name is required' });
+        }
+        if (!IN_MEMORY_STOCKS.buckets[name]) {
+            return res.status(404).json({ error: 'Bucket not found' });
+        }
+        delete IN_MEMORY_STOCKS.buckets[name];
+        saveStocks();
+        res.json({ success: true, buckets: IN_MEMORY_STOCKS.buckets });
+    } catch (err) {
+        console.error('[API] Error deleting bucket:', err.message);
+        res.status(500).json({ error: 'Failed to delete bucket' });
+    }
+});
+
+// Toggle a stock in a bucket
+app.post('/api/buckets/toggle', (req, res) => {
+    try {
+        const { bucket, ticker, add } = req.body;
+        if (!bucket || !ticker) {
+            return res.status(400).json({ error: 'Bucket name and ticker are required' });
+        }
+        if (!IN_MEMORY_STOCKS.buckets[bucket]) {
+            return res.status(404).json({ error: 'Bucket not found' });
+        }
+        const tickers = new Set(IN_MEMORY_STOCKS.buckets[bucket]);
+        if (add) {
+            tickers.add(ticker);
+        } else {
+            tickers.delete(ticker);
+        }
+        IN_MEMORY_STOCKS.buckets[bucket] = Array.from(tickers);
+        saveStocks();
+        res.json({ success: true, buckets: IN_MEMORY_STOCKS.buckets });
+    } catch (err) {
+        console.error('[API] Error toggling bucket:', err.message);
+        res.status(500).json({ error: 'Failed to toggle bucket stock' });
+    }
+});
+
+// ============================================
 // SIP Calculator Endpoint
 // ============================================
 function calculateSIPCagr(totalMonths, finalValue, monthlyInvestment = 100) {
@@ -571,13 +651,13 @@ app.get('/api/sip/:ticker', async (req, res) => {
         const timestamps = result.timestamp || [];
         const validData = [];
         let lastMonthStr = '';
-        
+
         for (let i = 0; i < closes.length; i++) {
             if (closes[i] != null && !isNaN(closes[i]) && timestamps[i]) {
                 const openPrice = (opens[i] != null && !isNaN(opens[i])) ? opens[i] : closes[i];
                 const d = new Date(timestamps[i] * 1000);
                 const monthStr = `${d.getFullYear()}-${d.getMonth()}`;
-                
+
                 if (validData.length > 0 && lastMonthStr === monthStr) {
                     // Update the close to the latest, but keep the original open price as the entry point
                     validData[validData.length - 1].close = closes[i];

@@ -82,7 +82,21 @@
     "QQQ",
     "SOXX",
     "AAPL",
-    "VEEV"
+    "VEEV",
+    "MOD",
+    "NVT",
+    "ETN",
+    "CEG",
+    "CAT",
+    "GLW",
+    "SCHNEIDER",
+    "PWR",
+    "GEV",
+    "STX",
+    "SMCI",
+    "TT",
+    "CARR",
+    "DELL"
   ],
   "universe": [
     {
@@ -548,6 +562,62 @@
     {
       "ticker": "VEEV",
       "sector": "Healthcare"
+    },
+    {
+      "ticker": "MOD",
+      "sector": "Consumer Cyclical"
+    },
+    {
+      "ticker": "NVT",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "ETN",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "CEG",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "CAT",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "GLW",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "SCHNEIDER",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "PWR",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "GEV",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "STX",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "SMCI",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "TT",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "CARR",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "DELL",
+      "sector": "Technology"
     }
   ],
   "shortlisted": [
@@ -582,5 +652,30 @@
     "CRWD",
     "TSLA",
     "AMD"
-  ]
+  ],
+  "buckets": {
+    "AI Benificiaries": [
+      "MOD",
+      "VRT",
+      "ANET",
+      "NVDA",
+      "AVGO",
+      "TSM",
+      "MU",
+      "CEG",
+      "GEV",
+      "ETN",
+      "MRVL",
+      "STX",
+      "AMD",
+      "SMCI",
+      "DELL",
+      "PWR",
+      "TT",
+      "CARR",
+      "GLW",
+      "NVT",
+      "CAT"
+    ]
+  }
 }

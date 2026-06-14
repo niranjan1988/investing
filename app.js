@@ -64,6 +64,8 @@ let currentSort = 'marketcap';
 let sortAscending = false;
 let searchQuery = '';
 let shortlistedStocks = [];
+let bucketsData = {};
+let activeDropdownTicker = null;
 
 // ============================================
 // DOM Elements
@@ -115,6 +117,22 @@ async function fetchShortlistedStocks() {
         }
     } catch (e) {
         console.error('Failed to load shortlisted stocks', e);
+    }
+}
+
+async function fetchBuckets() {
+    try {
+        const res = await fetch('/api/buckets');
+        if (res.ok) {
+            const data = await res.json();
+            bucketsData = data.buckets || {};
+            renderBucketBar();
+            if (currentFilter.startsWith('bucket:')) {
+                renderTable();
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load buckets', e);
     }
 }
 
@@ -229,7 +247,11 @@ function getFilteredAndSortedStocks() {
             stocks = stocks.filter(s => m7Tickers.includes(s.ticker));
             break;
         default:
-            if (currentFilter.startsWith('sector:')) {
+            if (currentFilter.startsWith('bucket:')) {
+                const bucketName = currentFilter.replace('bucket:', '');
+                const bucketTickers = bucketsData[bucketName] || [];
+                stocks = stocks.filter(s => bucketTickers.includes(s.ticker));
+            } else if (currentFilter.startsWith('sector:')) {
                 const sectorStr = currentFilter.replace('sector:', '');
                 stocks = stocks.filter(s => s.sector === sectorStr);
             } else if (currentFilter.startsWith('cap:')) {
@@ -368,6 +390,13 @@ function renderTable() {
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="7" y1="17" x2="17" y2="7"></line>
                                         <polyline points="7 7 17 7 17 17"></polyline>
+                                    </svg>
+                                </button>
+                                <button type="button" class="tv-btn bucket-add-btn" data-dropdown-ticker="${stock.ticker}" aria-label="Add to Bucket" title="Add to Bucket" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit; position: relative;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                        <line x1="12" y1="11" x2="12" y2="17"></line>
+                                        <line x1="9" y1="14" x2="15" y2="14"></line>
                                     </svg>
                                 </button>
                                 <button type="button" class="tv-btn" onclick="openSipModalForStock(event, '${stock.ticker}')" aria-label="Calculate SIP" title="Calculate SIP" style="background: none; border: none; padding: 0; cursor: pointer;">
@@ -583,6 +612,9 @@ function openModal(ticker) {
 
     // Fetch news
     fetchNews(ticker);
+
+    // Render bucket chips
+    renderModalBucketChips(ticker);
 }
 
 function closeModal() {
@@ -1222,6 +1254,371 @@ if (calculateSipBtn) {
 }
 
 // ============================================
+// Bucket Logic
+// ============================================
+
+function renderBucketBar() {
+    const bucketBar = document.getElementById('bucketBar');
+    const pillsContainer = document.getElementById('bucketPillsContainer');
+    if (!bucketBar || !pillsContainer) return;
+
+    const bucketNames = Object.keys(bucketsData);
+
+    // Always show bucket bar (even if empty, the + button is there)
+    bucketBar.style.display = 'flex';
+
+    if (bucketNames.length === 0) {
+        pillsContainer.innerHTML = '';
+        return;
+    }
+
+    pillsContainer.innerHTML = bucketNames.map(name => {
+        const count = bucketsData[name].length;
+        const isActive = currentFilter === 'bucket:' + name;
+        return `
+            <button class="bucket-pill ${isActive ? 'active' : ''}" data-bucket="${name}">
+                ${name}
+                <span class="bucket-count">${count}</span>
+                <span class="bucket-delete" data-bucket-delete="${name}" title="Delete bucket">&times;</span>
+            </button>
+        `;
+    }).join('');
+}
+
+function renderModalBucketChips(ticker) {
+    const container = document.getElementById('modalBucketChips');
+    if (!container) return;
+
+    const bucketNames = Object.keys(bucketsData);
+    if (bucketNames.length === 0) {
+        container.innerHTML = '<span class="modal-bucket-empty">No buckets yet. Create one from the bucket bar above.</span>';
+        return;
+    }
+
+    container.innerHTML = bucketNames.map(name => {
+        const isIn = bucketsData[name].includes(ticker);
+        return `<button class="bucket-chip ${isIn ? 'in-bucket' : ''}" data-bucket-chip="${name}">${name}</button>`;
+    }).join('');
+}
+
+async function toggleBucketStock(bucketName, ticker, add) {
+    try {
+        const res = await fetch('/api/buckets/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bucket: bucketName, ticker, add })
+        });
+        const data = await res.json();
+        if (data.success) {
+            bucketsData = data.buckets;
+            renderBucketBar();
+            if (currentFilter.startsWith('bucket:')) {
+                renderTable();
+            }
+        }
+    } catch (e) {
+        console.error('Failed to toggle bucket stock', e);
+    }
+}
+
+async function createBucket(name) {
+    try {
+        const res = await fetch('/api/buckets/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (data.success) {
+            bucketsData = data.buckets;
+            renderBucketBar();
+            return true;
+        } else {
+            alert(data.error || 'Failed to create bucket');
+            return false;
+        }
+    } catch (e) {
+        console.error('Failed to create bucket', e);
+        return false;
+    }
+}
+
+async function deleteBucket(name) {
+    if (!confirm(`Delete bucket "${name}"? This cannot be undone.`)) return;
+    try {
+        const res = await fetch('/api/buckets/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (data.success) {
+            bucketsData = data.buckets;
+            if (currentFilter === 'bucket:' + name) {
+                currentFilter = 'all';
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                const allBtn = document.getElementById('filterAll');
+                if (allBtn) allBtn.classList.add('active');
+                renderTable();
+            }
+            renderBucketBar();
+        }
+    } catch (e) {
+        console.error('Failed to delete bucket', e);
+    }
+}
+
+function openBucketView(bucketName) {
+    const overlay = document.getElementById('bucketViewOverlay');
+    const title = document.getElementById('bucketViewTitle');
+    const stocksContainer = document.getElementById('bucketViewStocks');
+    const emptyEl = document.getElementById('bucketViewEmpty');
+    if (!overlay) return;
+
+    title.textContent = '📂 ' + bucketName;
+    const tickers = bucketsData[bucketName] || [];
+
+    if (tickers.length === 0) {
+        stocksContainer.style.display = 'none';
+        emptyEl.style.display = 'block';
+    } else {
+        emptyEl.style.display = 'none';
+        stocksContainer.style.display = 'flex';
+        stocksContainer.innerHTML = tickers.map(ticker => {
+            const stock = stocksData.find(s => s.ticker === ticker);
+            const name = stock ? stock.name : ticker;
+            return `
+                <div class="bucket-view-stock-item">
+                    <div class="bucket-view-stock-info">
+                        <span class="bucket-view-stock-ticker">${ticker}</span>
+                        <span class="bucket-view-stock-name">${name}</span>
+                    </div>
+                    <button class="bucket-view-remove-btn" data-remove-from-bucket="${bucketName}" data-remove-ticker="${ticker}">Remove</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Bucket bar click handler (event delegation)
+const tableBucketDropdown = document.getElementById('tableBucketDropdown');
+const tableBucketDropdownList = document.getElementById('tableBucketDropdownList');
+
+document.addEventListener('click', (e) => {
+    // Delete bucket
+    const deleteBtn = e.target.closest('[data-bucket-delete]');
+    if (deleteBtn) {
+        e.stopPropagation();
+        const name = deleteBtn.dataset.bucketDelete;
+        deleteBucket(name);
+        return;
+    }
+
+    // Bucket pill click (filter or view)
+    const pill = e.target.closest('.bucket-pill');
+    if (pill && !e.target.closest('[data-bucket-delete]')) {
+        const name = pill.dataset.bucket;
+        const isAlreadyActive = currentFilter === 'bucket:' + name;
+
+        if (isAlreadyActive) {
+            // Open bucket view modal on second click
+            openBucketView(name);
+        } else {
+            // First click: filter by bucket
+            currentFilter = 'bucket:' + name;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            renderBucketBar();
+            renderTable();
+        }
+        return;
+    }
+
+    // Modal bucket chip click
+    const chip = e.target.closest('[data-bucket-chip]');
+    if (chip && activeModalTicker) {
+        const bucketName = chip.dataset.bucketChip;
+        const isIn = bucketsData[bucketName]?.includes(activeModalTicker);
+
+        // Optimistic UI
+        if (isIn) {
+            chip.classList.remove('in-bucket');
+        } else {
+            chip.classList.add('in-bucket');
+        }
+
+        toggleBucketStock(bucketName, activeModalTicker, !isIn).then(() => {
+            renderModalBucketChips(activeModalTicker);
+        });
+        return;
+    }
+
+    // Bucket view remove button
+    const removeBtn = e.target.closest('[data-remove-from-bucket]');
+    if (removeBtn) {
+        const bucketName = removeBtn.dataset.removeFromBucket;
+        const ticker = removeBtn.dataset.removeTicker;
+        toggleBucketStock(bucketName, ticker, false).then(() => {
+            openBucketView(bucketName);
+        });
+        return;
+    }
+    
+    // Table row bucket add button
+    const bucketAddBtn = e.target.closest('.bucket-add-btn');
+    if (bucketAddBtn && tableBucketDropdown) {
+        e.stopPropagation();
+        activeDropdownTicker = bucketAddBtn.dataset.dropdownTicker;
+        
+        // Render options
+        const bucketNames = Object.keys(bucketsData);
+        if (bucketNames.length === 0) {
+            tableBucketDropdownList.innerHTML = '<div style="padding: 8px; color: var(--text-dim); font-size: 0.8rem; text-align: center;">No buckets found</div>';
+        } else {
+            tableBucketDropdownList.innerHTML = bucketNames.map(name => {
+                const isIn = bucketsData[name].includes(activeDropdownTicker);
+                return `<button class="dropdown-item ${isIn ? 'in-bucket' : ''}" data-dropdown-bucket="${name}">${name}</button>`;
+            }).join('');
+        }
+        
+        // Position
+        const rect = bucketAddBtn.getBoundingClientRect();
+        tableBucketDropdown.style.display = 'block';
+        
+        setTimeout(() => {
+            tableBucketDropdown.classList.add('active');
+            tableBucketDropdown.style.top = `${rect.bottom + window.scrollY + 8}px`;
+            
+            const dropdownWidth = tableBucketDropdown.offsetWidth || 160;
+            if (rect.left + dropdownWidth > window.innerWidth) {
+                tableBucketDropdown.style.left = `${rect.right + window.scrollX - dropdownWidth}px`;
+            } else {
+                tableBucketDropdown.style.left = `${rect.left + window.scrollX}px`;
+            }
+        }, 10);
+        
+        return;
+    }
+
+    // Dropdown item click
+    const dropdownItem = e.target.closest('.dropdown-item');
+    if (dropdownItem && activeDropdownTicker) {
+        e.stopPropagation();
+        const bucketName = dropdownItem.dataset.dropdownBucket;
+        const isIn = bucketsData[bucketName].includes(activeDropdownTicker);
+        
+        // Optimistic UI
+        if (isIn) {
+            dropdownItem.classList.remove('in-bucket');
+        } else {
+            dropdownItem.classList.add('in-bucket');
+        }
+        
+        toggleBucketStock(bucketName, activeDropdownTicker, !isIn);
+        return;
+    }
+    
+    // Close dropdown on outside click
+    if (tableBucketDropdown && tableBucketDropdown.classList.contains('active')) {
+        tableBucketDropdown.classList.remove('active');
+        setTimeout(() => {
+            tableBucketDropdown.style.display = 'none';
+        }, 150);
+    }
+});
+
+// Create bucket modal
+const openCreateBucketBtn = document.getElementById('openCreateBucketBtn');
+const createBucketOverlay = document.getElementById('createBucketOverlay');
+const createBucketInput = document.getElementById('createBucketInput');
+const createBucketCancel = document.getElementById('createBucketCancel');
+const createBucketSubmit = document.getElementById('createBucketSubmit');
+
+if (openCreateBucketBtn) {
+    openCreateBucketBtn.addEventListener('click', () => {
+        createBucketOverlay.classList.add('active');
+        createBucketInput.value = '';
+        setTimeout(() => createBucketInput.focus(), 100);
+    });
+}
+
+function closeCreateBucketModal() {
+    createBucketOverlay.classList.remove('active');
+}
+
+if (createBucketCancel) {
+    createBucketCancel.addEventListener('click', closeCreateBucketModal);
+}
+
+if (createBucketOverlay) {
+    createBucketOverlay.addEventListener('click', (e) => {
+        if (e.target === createBucketOverlay) closeCreateBucketModal();
+    });
+}
+
+if (createBucketSubmit) {
+    createBucketSubmit.addEventListener('click', async () => {
+        const name = createBucketInput.value.trim();
+        if (!name) return;
+        const success = await createBucket(name);
+        if (success) closeCreateBucketModal();
+    });
+}
+
+if (createBucketInput) {
+    createBucketInput.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const name = createBucketInput.value.trim();
+            if (!name) return;
+            const success = await createBucket(name);
+            if (success) closeCreateBucketModal();
+        }
+        if (e.key === 'Escape') {
+            closeCreateBucketModal();
+        }
+    });
+}
+
+// Bucket view modal close
+const bucketViewOverlay = document.getElementById('bucketViewOverlay');
+const bucketViewClose = document.getElementById('bucketViewClose');
+
+if (bucketViewClose) {
+    bucketViewClose.addEventListener('click', () => {
+        bucketViewOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+}
+
+if (bucketViewOverlay) {
+    bucketViewOverlay.addEventListener('click', (e) => {
+        if (e.target === bucketViewOverlay) {
+            bucketViewOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+// Reset bucket bar when 'All' filter or any other filter-btn is clicked
+// (already handled by existing filter click delegation, just need to re-render bucket pills)
+const origFilterClickHandler = () => {
+    // If user clicks a non-bucket filter, deactivate bucket pills
+    if (!currentFilter.startsWith('bucket:')) {
+        renderBucketBar();
+    }
+};
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (btn) {
+        // The existing handler already sets currentFilter. We just re-render bucket bar.
+        setTimeout(origFilterClickHandler, 0);
+    }
+});
+
+// ============================================
 // Go to Top Button
 // ============================================
 const goToTopBtn = document.getElementById('goToTopBtn');
@@ -1248,5 +1645,6 @@ if (goToTopBtn) {
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
     fetchShortlistedStocks();
+    fetchBuckets();
     fetchStockData();
 });
