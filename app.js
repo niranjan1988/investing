@@ -242,10 +242,6 @@ function getFilteredAndSortedStocks() {
         case 'shortlisted':
             stocks = stocks.filter(s => shortlistedStocks.includes(s.ticker));
             break;
-        case 'm7':
-            const m7Tickers = ['AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'NVDA', 'META', 'TSLA'];
-            stocks = stocks.filter(s => m7Tickers.includes(s.ticker));
-            break;
         default:
             if (currentFilter.startsWith('bucket:')) {
                 const bucketName = currentFilter.replace('bucket:', '');
@@ -322,7 +318,6 @@ function renderFilters() {
     }
 
     let html = `<button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all" id="filterAll">All</button>`;
-    html += `<button class="filter-btn ${currentFilter === 'm7' ? 'active' : ''}" data-filter="m7" id="filterM7">M7</button>`;
 
     sectors.forEach(sector => {
         const filterVal = 'sector:' + sector;
@@ -1465,13 +1460,13 @@ document.addEventListener('click', (e) => {
         });
         return;
     }
-    
+
     // Table row bucket add button
     const bucketAddBtn = e.target.closest('.bucket-add-btn');
     if (bucketAddBtn && tableBucketDropdown) {
         e.stopPropagation();
         activeDropdownTicker = bucketAddBtn.dataset.dropdownTicker;
-        
+
         // Render options
         const bucketNames = Object.keys(bucketsData);
         if (bucketNames.length === 0) {
@@ -1482,15 +1477,15 @@ document.addEventListener('click', (e) => {
                 return `<button class="dropdown-item ${isIn ? 'in-bucket' : ''}" data-dropdown-bucket="${name}">${name}</button>`;
             }).join('');
         }
-        
+
         // Position
         const rect = bucketAddBtn.getBoundingClientRect();
         tableBucketDropdown.style.display = 'block';
-        
+
         setTimeout(() => {
             tableBucketDropdown.classList.add('active');
             tableBucketDropdown.style.top = `${rect.bottom + window.scrollY + 8}px`;
-            
+
             const dropdownWidth = tableBucketDropdown.offsetWidth || 160;
             if (rect.left + dropdownWidth > window.innerWidth) {
                 tableBucketDropdown.style.left = `${rect.right + window.scrollX - dropdownWidth}px`;
@@ -1498,7 +1493,7 @@ document.addEventListener('click', (e) => {
                 tableBucketDropdown.style.left = `${rect.left + window.scrollX}px`;
             }
         }, 10);
-        
+
         return;
     }
 
@@ -1508,18 +1503,18 @@ document.addEventListener('click', (e) => {
         e.stopPropagation();
         const bucketName = dropdownItem.dataset.dropdownBucket;
         const isIn = bucketsData[bucketName].includes(activeDropdownTicker);
-        
+
         // Optimistic UI
         if (isIn) {
             dropdownItem.classList.remove('in-bucket');
         } else {
             dropdownItem.classList.add('in-bucket');
         }
-        
+
         toggleBucketStock(bucketName, activeDropdownTicker, !isIn);
         return;
     }
-    
+
     // Close dropdown on outside click
     if (tableBucketDropdown && tableBucketDropdown.classList.contains('active')) {
         tableBucketDropdown.classList.remove('active');
@@ -1531,10 +1526,11 @@ document.addEventListener('click', (e) => {
 
 // Create bucket modal
 const openCreateBucketBtn = document.getElementById('openCreateBucketBtn');
-const createBucketOverlay = document.getElementById('createBucketOverlay');
-const createBucketInput = document.getElementById('createBucketInput');
+const createBucketOverlay = document.getElementById('createBucketModalOverlay');
+const createBucketInput = document.getElementById('newBucketNameInput');
 const createBucketCancel = document.getElementById('createBucketCancel');
-const createBucketSubmit = document.getElementById('createBucketSubmit');
+const createBucketSubmit = document.getElementById('createBucketConfirm');
+const createBucketClose = document.getElementById('createBucketModalClose');
 
 if (openCreateBucketBtn) {
     openCreateBucketBtn.addEventListener('click', () => {
@@ -1550,6 +1546,10 @@ function closeCreateBucketModal() {
 
 if (createBucketCancel) {
     createBucketCancel.addEventListener('click', closeCreateBucketModal);
+}
+
+if (createBucketClose) {
+    createBucketClose.addEventListener('click', closeCreateBucketModal);
 }
 
 if (createBucketOverlay) {
@@ -1583,8 +1583,8 @@ if (createBucketInput) {
 }
 
 // Bucket view modal close
-const bucketViewOverlay = document.getElementById('bucketViewOverlay');
-const bucketViewClose = document.getElementById('bucketViewClose');
+const bucketViewOverlay = document.getElementById('bucketViewModalOverlay');
+const bucketViewClose = document.getElementById('bucketViewModalClose');
 
 if (bucketViewClose) {
     bucketViewClose.addEventListener('click', () => {
