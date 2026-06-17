@@ -166,6 +166,7 @@ async function fetchStockData(silent = false) {
         }
 
         renderFilters();
+        renderBucketBar();
         renderTable();
     } catch (err) {
         console.error('Failed to fetch stock data:', err);
@@ -370,7 +371,7 @@ function renderTable() {
         const tickerDecoration = isShortlisted ? '<span style="color: var(--yellow-400); margin-right: 4px;">★</span>' : '';
 
         return `
-            <tr data-ticker="${stock.ticker}" onclick="openTradingViewPanel('${stock.ticker}')">
+            <tr data-ticker="${stock.ticker}" onclick="if(event.target.closest('.bucket-add-btn')) return; openTradingViewPanel('${stock.ticker}')">
                 <td class="col-rank"><span class="rank-num">${index + 1}</span></td>
                 <td class="col-stock">
                     <div class="stock-info">
@@ -1268,7 +1269,8 @@ function renderBucketBar() {
     }
 
     pillsContainer.innerHTML = bucketNames.map(name => {
-        const count = bucketsData[name].length;
+        const activeTickers = bucketsData[name].filter(ticker => stocksData.some(s => s.ticker === ticker));
+        const count = activeTickers.length;
         const isActive = currentFilter === 'bucket:' + name;
         return `
             <button class="bucket-pill ${isActive ? 'active' : ''}" data-bucket="${name}">
@@ -1364,24 +1366,29 @@ async function deleteBucket(name) {
 }
 
 function openBucketView(bucketName) {
-    const overlay = document.getElementById('bucketViewOverlay');
+    const overlay = document.getElementById('bucketViewModalOverlay') || document.getElementById('bucketViewOverlay');
     const title = document.getElementById('bucketViewTitle');
-    const stocksContainer = document.getElementById('bucketViewStocks');
-    const emptyEl = document.getElementById('bucketViewEmpty');
+    const stocksContainer = document.getElementById('bucketViewList') || document.getElementById('bucketViewStocks');
+    const countEl = document.getElementById('bucketViewCount');
     if (!overlay) return;
 
     title.textContent = '📂 ' + bucketName;
     const tickers = bucketsData[bucketName] || [];
+    const activeTickers = tickers.filter(ticker => stocksData.some(s => s.ticker === ticker));
 
-    if (tickers.length === 0) {
-        stocksContainer.style.display = 'none';
-        emptyEl.style.display = 'block';
+    if (countEl) countEl.textContent = activeTickers.length + (activeTickers.length === 1 ? ' stock' : ' stocks');
+
+    if (activeTickers.length === 0) {
+        if (stocksContainer) {
+            stocksContainer.style.display = 'block';
+            stocksContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No stocks in this bucket.</div>';
+        }
     } else {
-        emptyEl.style.display = 'none';
-        stocksContainer.style.display = 'flex';
-        stocksContainer.innerHTML = tickers.map(ticker => {
-            const stock = stocksData.find(s => s.ticker === ticker);
-            const name = stock ? stock.name : ticker;
+        if (stocksContainer) {
+            stocksContainer.style.display = 'flex';
+            stocksContainer.innerHTML = activeTickers.map(ticker => {
+                const stock = stocksData.find(s => s.ticker === ticker);
+                const name = stock ? stock.name : ticker;
             return `
                 <div class="bucket-view-stock-item">
                     <div class="bucket-view-stock-info">
@@ -1392,6 +1399,7 @@ function openBucketView(bucketName) {
                 </div>
             `;
         }).join('');
+        }
     }
 
     overlay.classList.add('active');

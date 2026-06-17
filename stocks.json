@@ -97,7 +97,16 @@
     "TT",
     "DELL",
     "HUBB",
-    "BTC"
+    "BTC",
+    "VST",
+    "MTZ",
+    "FIX",
+    "CSCO",
+    "CIEN",
+    "FN",
+    "DLR",
+    "STRL",
+    "EQIX"
   ],
   "universe": [
     {
@@ -627,6 +636,42 @@
     {
       "ticker": "BTC",
       "sector": "Unknown"
+    },
+    {
+      "ticker": "VST",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "MTZ",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "FIX",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "CSCO",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "CIEN",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "FN",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "DLR",
+      "sector": "Real Estate"
+    },
+    {
+      "ticker": "STRL",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "EQIX",
+      "sector": "Real Estate"
     }
   ],
   "shortlisted": [
@@ -685,7 +730,18 @@
       "GLW",
       "NVT",
       "CAT",
-      "HUBB"
+      "HUBB",
+      "VST",
+      "MTZ",
+      "FIX",
+      "CSCO",
+      "CIEN",
+      "FN",
+      "DLR",
+      "CRWD",
+      "PANW",
+      "EQIX",
+      "STRL"
     ],
     "M7": [
       "NVDA",
@@ -700,6 +756,11 @@
       "COIN",
       "MSTR",
       "BTC"
+    ],
+    "Security": [
+      "PANW",
+      "CRWD",
+      "FTNT"
     ]
   }
 }
