@@ -62,10 +62,6 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="market-status" id="marketStatus">
-                    <span class="status-dot"></span>
-                    <span class="status-text">Market Data</span>
-                </div>
                 <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme" aria-label="Toggle theme">
                     <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
@@ -111,9 +107,14 @@
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                 </button>
-                <div class="last-updated" id="lastUpdated">
-                    Updated: Feb 2026
-                </div>
+                <a href="targets.html" class="theme-toggle" title="Price Targets" aria-label="Price Targets" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 16 16 12 12 8"></polyline>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    Price Targets
+                </a>
             </div>
         </header>
 

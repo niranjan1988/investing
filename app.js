@@ -160,7 +160,7 @@ async function fetchStockData(silent = false) {
         });
 
         // Update last-updated timestamp
-        if (data.timestamp) {
+        if (data.timestamp && lastUpdatedEl) {
             const ts = new Date(data.timestamp);
             lastUpdatedEl.textContent = `Updated: ${ts.toLocaleString()}`;
         }

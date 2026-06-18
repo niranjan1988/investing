@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst Price Targets | StockPulse</title>
+    <meta name="description" content="View analyst price targets and implied upside for tracked stocks.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Force left alignment for equal visual spacing */
+        #stockTable th, #stockTable td {
+            text-align: left !important;
+        }
+        #stockTable th.col-rank, #stockTable td.col-rank {
+            text-align: center !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                            <polyline points="16 7 22 7 22 13"></polyline>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>StockPulse</h1>
+                        <span class="logo-subtitle">PRICE TARGETS</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-center" style="justify-content: flex-start;">
+                <a href="index.html" class="theme-toggle" style="text-decoration: none; display: flex; align-items: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Dashboard
+                </a>
+                <div class="search-container" id="searchContainer" style="margin-left: 20px;">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search stocks..." autocomplete="off">
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme" aria-label="Toggle theme">
+                    <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="dashboard-layout">
+            <div class="dashboard-left" style="flex: 1; max-width: none;">
+                <div class="top-bar-container">
+                    <div class="sort-group">
+                        <label class="sort-label">Sort by:</label>
+                        <select id="sortSelect" class="sort-select">
+                            <option value="upside">Mean Upside %</option>
+                            <option value="upside_high">High Upside %</option>
+                            <option value="name">Name</option>
+                            <option value="sector">Sector</option>
+                            <option value="rating">Analyst Rating</option>
+                        </select>
+                        <button class="sort-order-btn" id="sortOrderBtn" title="Toggle sort order">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12l7-7 7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <section class="table-section">
+                    <div class="table-container">
+                        <table class="stock-table" id="stockTable" style="table-layout: fixed; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th class="col-rank" style="width: 4%;">#</th>
+                                    <th style="width: 13.7%;">Stock</th>
+                                    <th style="width: 13.7%;">Sector</th>
+                                    <th style="width: 13.7%;">Current Price</th>
+                                    <th style="width: 13.7%;">Low Target</th>
+                                    <th style="width: 13.7%;">Mean Target</th>
+                                    <th style="width: 13.7%;">High Target</th>
+                                    <th style="width: 13.7%;">Analyst Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stockTableBody">
+                                <!-- Rows populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="no-results" id="noResults" style="display:none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                        <p>No stocks match your search</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Target prices provided by Yahoo Finance. For informational purposes only. Not financial advice.</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Fetching analyst targets from Yahoo Finance...</p>
+            <p class="loading-subtext">This may take a few moments</p>
+        </div>
+    </div>
+
+    <!-- Go to Top Button -->
+    <button id="goToTopBtn" class="go-to-top" aria-label="Go to top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+    </button>
+
+    <script src="targets.js"></script>
+</body>
+
+</html>

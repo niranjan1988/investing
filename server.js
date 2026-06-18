@@ -110,6 +110,10 @@ let fullDataCache = null;
 let fullDataCacheTime = 0;
 const FULL_DATA_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+let targetsCache = null;
+let targetsCacheTime = 0;
+const TARGETS_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
+
 // ============================================
 // Yahoo Finance API Functions
 // ============================================
@@ -275,6 +279,67 @@ async function fetchAllATHs(tickers, concurrency = 8) {
     return results;
 }
 
+/**
+ * Fetch analyst targets for a single ticker.
+ */
+async function fetchTarget(ticker) {
+    const { crumb, cookies } = await getYahooAuth();
+    const yahooTicker = toYahooTicker(ticker);
+    try {
+        const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${yahooTicker}?modules=financialData,price&crumb=${encodeURIComponent(crumb)}`;
+        const response = await fetch(url, {
+            headers: { 'User-Agent': YAHOO_UA, 'Cookie': cookies }
+        });
+        if (!response.ok) throw new Error(`Status ${response.status}`);
+        const data = await response.json();
+        const financialData = data?.quoteSummary?.result?.[0]?.financialData;
+        if (!financialData) return null;
+        const priceData = data?.quoteSummary?.result?.[0]?.price;
+        
+        return {
+            name: priceData?.shortName || priceData?.longName || ticker,
+            targetLowPrice: financialData.targetLowPrice?.raw || null,
+            targetMeanPrice: financialData.targetMeanPrice?.raw || null,
+            targetMedianPrice: financialData.targetMedianPrice?.raw || null,
+            targetHighPrice: financialData.targetHighPrice?.raw || null,
+            recommendationKey: financialData.recommendationKey || null,
+            numberOfAnalystOpinions: financialData.numberOfAnalystOpinions?.raw || null,
+            currentPrice: financialData.currentPrice?.raw || null,
+        };
+    } catch (err) {
+        console.warn(`[Yahoo] Targets error for ${ticker}: ${err.message}`);
+        return null;
+    }
+}
+
+/**
+ * Fetch targets for all tickers with concurrency control.
+ */
+async function fetchAllTargets(tickers, concurrency = 5) {
+    const results = {};
+    const queue = [...tickers];
+    let completed = 0;
+
+    async function worker() {
+        while (queue.length > 0) {
+            const ticker = queue.shift();
+            if (!ticker) break;
+            results[ticker] = await fetchTarget(ticker);
+            completed++;
+            if (completed % 20 === 0) {
+                console.log(`[API] Targets progress: ${completed}/${tickers.length}`);
+            }
+        }
+    }
+
+    const workers = [];
+    for (let i = 0; i < Math.min(concurrency, tickers.length); i++) {
+        workers.push(worker());
+    }
+    await Promise.all(workers);
+    return results;
+}
+
 // ============================================
 // API Endpoint
 // ============================================
@@ -382,6 +447,62 @@ app.get('/api/news/:ticker', async (req, res) => {
     } catch (err) {
         console.error(`[API] News Error for ${req.params.ticker}:`, err.message);
         res.status(500).json({ error: 'Failed to fetch news', message: err.message });
+    }
+});
+
+// ============================================
+// Price Targets API Endpoint
+// ============================================
+app.get('/api/targets', async (req, res) => {
+    try {
+        if (targetsCache && (Date.now() - targetsCacheTime < TARGETS_CACHE_TTL)) {
+            return res.json(targetsCache);
+        }
+
+        console.log('[API] Fetching fresh target data...');
+        const startTime = Date.now();
+        const activeTickers = new Set(IN_MEMORY_STOCKS.active);
+        const ACTIVE_STOCK_UNIVERSE = IN_MEMORY_STOCKS.universe.filter(s => activeTickers.has(s.ticker));
+        const tickers = ACTIVE_STOCK_UNIVERSE.map(s => s.ticker);
+
+        const targetsMap = await fetchAllTargets(tickers, 5);
+
+        const targets = ACTIVE_STOCK_UNIVERSE.map(config => {
+            const t = targetsMap[config.ticker];
+            if (!t) return null;
+
+            return {
+                ticker: config.ticker,
+                name: t.name || config.name || config.ticker,
+                sector: config.sector,
+                currentPrice: t.currentPrice,
+                targetLow: t.targetLowPrice,
+                targetMean: t.targetMeanPrice,
+                targetMedian: t.targetMedianPrice,
+                targetHigh: t.targetHighPrice,
+                recommendation: t.recommendationKey,
+                analysts: t.numberOfAnalystOpinions,
+                upsideMean: (t.targetMeanPrice && t.currentPrice) ? 
+                            Math.round(((t.targetMeanPrice / t.currentPrice) - 1) * 1000) / 10 : null
+            };
+        }).filter(Boolean);
+
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(`[API] Fetched targets for ${targets.length}/${ACTIVE_STOCK_UNIVERSE.length} stocks in ${elapsed}s`);
+
+        const responseData = {
+            targets,
+            timestamp: new Date().toISOString(),
+            count: targets.length,
+        };
+
+        targetsCache = responseData;
+        targetsCacheTime = Date.now();
+
+        res.json(responseData);
+    } catch (err) {
+        console.error('[API] Error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch target data', message: err.message });
     }
 });
 
