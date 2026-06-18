@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = 4000;
+const PORT = 3000;
 
 // ============================================
 // Yahoo Finance Ticker Mapping
@@ -295,7 +295,7 @@ async function fetchTarget(ticker) {
         const financialData = data?.quoteSummary?.result?.[0]?.financialData;
         if (!financialData) return null;
         const priceData = data?.quoteSummary?.result?.[0]?.price;
-        
+
         return {
             name: priceData?.shortName || priceData?.longName || ticker,
             targetLowPrice: financialData.targetLowPrice?.raw || null,
@@ -482,8 +482,8 @@ app.get('/api/targets', async (req, res) => {
                 targetHigh: t.targetHighPrice,
                 recommendation: t.recommendationKey,
                 analysts: t.numberOfAnalystOpinions,
-                upsideMean: (t.targetMeanPrice && t.currentPrice) ? 
-                            Math.round(((t.targetMeanPrice / t.currentPrice) - 1) * 1000) / 10 : null
+                upsideMean: (t.targetMeanPrice && t.currentPrice) ?
+                    Math.round(((t.targetMeanPrice / t.currentPrice) - 1) * 1000) / 10 : null
             };
         }).filter(Boolean);
 

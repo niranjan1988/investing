@@ -93,7 +93,6 @@
     "PWR",
     "GEV",
     "STX",
-    "SMCI",
     "TT",
     "DELL",
     "HUBB",
@@ -106,7 +105,8 @@
     "FN",
     "DLR",
     "STRL",
-    "EQIX"
+    "EQIX",
+    "INTC"
   ],
   "universe": [
     {
@@ -712,7 +712,6 @@
       "MOD",
       "VRT",
       "ANET",
-      "NVDA",
       "AVGO",
       "TSM",
       "MU",
@@ -741,7 +740,8 @@
       "CRWD",
       "PANW",
       "EQIX",
-      "STRL"
+      "STRL",
+      "NVDA"
     ],
     "M7": [
       "NVDA",
@@ -767,6 +767,55 @@
       "TSM",
       "AVGO",
       "AMD"
+    ],
+    "Buy Radar": [
+      "CEG",
+      "NVDA",
+      "FN",
+      "ANET",
+      "MOD",
+      "MSTR",
+      "MPWR",
+      "IRMD",
+      "GOOG",
+      "UTHR",
+      "SPGI",
+      "SNPS",
+      "VRT",
+      "DXCM",
+      "AVGO",
+      "UI",
+      "MELI",
+      "RBRK",
+      "IONQ",
+      "CPRT",
+      "ISRG",
+      "NFLX",
+      "AXON",
+      "APPF",
+      "TEM",
+      "PTC",
+      "DOCS",
+      "ZS",
+      "CLBT",
+      "VEEV",
+      "ADSK",
+      "MSFT",
+      "NOW",
+      "ADMA",
+      "PCTY",
+      "ADBE",
+      "HRMY",
+      "INTU",
+      "VKTX"
+    ],
+    "only downside": [
+      "ALAB",
+      "SEZL",
+      "KLAC"
+    ],
+    "only upside": [
+      "VKTX"
     ]
   }
 }

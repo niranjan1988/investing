@@ -53,6 +53,13 @@
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                     <input type="text" id="searchInput" placeholder="Search stocks..." autocomplete="off">
+                    <button class="clear-search-btn" id="clearSearchBtn" aria-label="Clear search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <kbd class="search-shortcut">⌘K</kbd>
                 </div>
             </div>
             <div class="header-right">
@@ -78,7 +85,18 @@
         <!-- Main Content -->
         <div class="dashboard-layout">
             <div class="dashboard-left" style="flex: 1; max-width: none;">
-                <div class="top-bar-container">
+                <div class="top-bar-container" style="flex-wrap: wrap;">
+                    <!-- Bucket Bar -->
+                    <div class="bucket-bar" id="bucketBar" style="display: none; flex-wrap: wrap; margin-right: auto;">
+                        <span class="bucket-bar-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Buckets
+                        </span>
+                        <div id="bucketPillsContainer" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;"></div>
+                    </div>
+
                     <div class="sort-group">
                         <label class="sort-label">Sort by:</label>
                         <select id="sortSelect" class="sort-select">
@@ -127,6 +145,12 @@
                 </section>
             </div>
         </div>
+
+    <!-- Table Bucket Dropdown -->
+    <div id="tableBucketDropdown" class="table-bucket-dropdown" style="display: none;">
+        <div class="dropdown-header">Add to Bucket</div>
+        <div class="dropdown-list" id="tableBucketDropdownList"></div>
+    </div>
 
         <!-- Footer -->
         <footer class="app-footer">
