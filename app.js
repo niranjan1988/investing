@@ -636,7 +636,7 @@ function openTradingViewPanel(ticker) {
     // TradingView Lightweight widget embed
     chartPanelBody.innerHTML = `
         <iframe 
-            src="https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=W&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&theme=${currentTheme}&style=1" 
+            src="https://s.tradingview.com/widgetembed/?symbol=${ticker}&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&theme=${currentTheme}&style=1" 
             width="100%" 
             height="100%" 
             frameborder="0" 
@@ -1389,7 +1389,7 @@ function openBucketView(bucketName) {
             stocksContainer.innerHTML = activeTickers.map(ticker => {
                 const stock = stocksData.find(s => s.ticker === ticker);
                 const name = stock ? stock.name : ticker;
-            return `
+                return `
                 <div class="bucket-view-stock-item">
                     <div class="bucket-view-stock-info">
                         <span class="bucket-view-stock-ticker">${ticker}</span>
@@ -1398,7 +1398,7 @@ function openBucketView(bucketName) {
                     <button class="bucket-view-remove-btn" data-remove-from-bucket="${bucketName}" data-remove-ticker="${ticker}">Remove</button>
                 </div>
             `;
-        }).join('');
+            }).join('');
         }
     }
 

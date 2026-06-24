@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortOrderBtn = document.getElementById('sortOrderBtn');
     const themeToggle = document.getElementById('themeToggle');
     const goToTopBtn = document.getElementById('goToTopBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
 
     let targetData = [];
     let currentSort = 'upside';
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // Render Table
     // ==========================================
-    function renderTable() {
+    function getFilteredAndSortedTargets() {
         let filtered = targetData.filter(stock => {
             if (currentBucket && (!bucketsData[currentBucket] || !bucketsData[currentBucket].includes(stock.ticker))) {
                 return false;
@@ -143,6 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'upside_high':
                     valA = (a.targetHigh && a.currentPrice) ? ((a.targetHigh / a.currentPrice) - 1) : -Infinity;
                     valB = (b.targetHigh && b.currentPrice) ? ((b.targetHigh / b.currentPrice) - 1) : -Infinity;
+                    break;
+                case 'upside_low':
+                    valA = (a.targetLow && a.currentPrice) ? ((a.targetLow / a.currentPrice) - 1) : -Infinity;
+                    valB = (b.targetLow && b.currentPrice) ? ((b.targetLow / b.currentPrice) - 1) : -Infinity;
                     break;
                 case 'name':
                     valA = a.ticker;
@@ -166,6 +171,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (valA > valB) return sortAscending ? 1 : -1;
             return 0;
         });
+
+        return filtered;
+    }
+
+    function renderTable() {
+        const filtered = getFilteredAndSortedTargets();
 
         tableBody.innerHTML = '';
 
@@ -268,6 +279,47 @@ document.addEventListener('DOMContentLoaded', () => {
         sortOrderBtn.style.transform = sortAscending ? 'rotate(180deg)' : 'none';
         renderTable();
     });
+
+    if (exportExcelBtn) {
+        exportExcelBtn.addEventListener('click', () => {
+            const filtered = getFilteredAndSortedTargets();
+            if (filtered.length === 0) return;
+
+            const headers = [
+                'Ticker', 'Name', 'Sector', 'Current Price ($)', 'Low Target ($)',
+                'Mean Target ($)', 'High Target ($)', 'Analyst Rating', 'Upside (%)'
+            ];
+
+            let csvContent = headers.join(',') + '\n';
+
+            filtered.forEach(stock => {
+                const nameStr = stock.name ? `"${stock.name.replace(/"/g, '""')}"` : '';
+                const upside = stock.currentPrice && stock.targetMean ? (((stock.targetMean / stock.currentPrice) - 1) * 100).toFixed(2) : '';
+                const row = [
+                    stock.ticker,
+                    nameStr,
+                    stock.sector || '',
+                    stock.currentPrice || '',
+                    stock.targetLow || '',
+                    stock.targetMean || '',
+                    stock.targetHigh || '',
+                    stock.recommendation || '',
+                    upside
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'stockpulse_targets_export.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
 
     const tableBucketDropdown = document.getElementById('tableBucketDropdown');
     const tableBucketDropdownList = document.getElementById('tableBucketDropdownList');

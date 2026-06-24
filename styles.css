@@ -2248,6 +2248,7 @@ body::before {
 
 .bucket-view-count {
     margin-left: auto;
+    margin-right: 36px;
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-muted);

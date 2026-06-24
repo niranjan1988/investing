@@ -815,7 +815,11 @@
       "KLAC"
     ],
     "only upside": [
-      "VKTX"
+      "VKTX",
+      "PCTY",
+      "ADMA",
+      "ADSK",
+      "INTU"
     ]
   }
 }

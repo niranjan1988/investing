@@ -63,6 +63,13 @@
                 </div>
             </div>
             <div class="header-right">
+                <button class="theme-toggle" id="exportExcelBtn" title="Download as Excel" aria-label="Download as Excel">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
                 <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme" aria-label="Toggle theme">
                     <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -102,6 +109,7 @@
                         <select id="sortSelect" class="sort-select">
                             <option value="upside">Mean Upside %</option>
                             <option value="upside_high">High Upside %</option>
+                            <option value="upside_low">Low Upside %</option>
                             <option value="name">Name</option>
                             <option value="sector">Sector</option>
                             <option value="rating">Analyst Rating</option>
