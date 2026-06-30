@@ -277,6 +277,11 @@ function getFilteredAndSortedStocks() {
             case 'price':
                 comparison = b.price - a.price;
                 break;
+            case 'pe':
+                const peA = (a.pe == null || isNaN(Number(a.pe))) ? -Infinity : Number(a.pe);
+                const peB = (b.pe == null || isNaN(Number(b.pe))) ? -Infinity : Number(b.pe);
+                comparison = peB - peA;
+                break;
             case 'cagr5Y':
                 comparison = (b.cagr5Y ?? -Infinity) - (a.cagr5Y ?? -Infinity);
                 break;
@@ -408,10 +413,10 @@ function renderTable() {
                 <td class="col-sector"><span class="sector-badge" style="background:${avatarColors.bg};color:${avatarColors.color};border-color:${avatarColors.color}33">${stock.sector}</span></td>
                 <td class="col-cap"><span class="cap-badge cap-${stock.cap}">${stock.cap}</span></td>
                 <td class="col-mcap">
-                    <div class="price-container">
-                        <span class="price-cell">${formatMarketCap(stock.mcap)}</span>
-                        ${stock.pe ? `<span class="prev-close-cell">P/E: ${stock.pe}</span>` : `<span class="prev-close-cell" style="opacity:0.5">P/E: —</span>`}
-                    </div>
+                    <span class="price-cell">${formatMarketCap(stock.mcap)}</span>
+                </td>
+                <td class="col-pe">
+                    <span class="price-cell" style="color: var(--text-secondary);">${stock.pe ? stock.pe : '—'}</span>
                 </td>
                 <td class="col-price">
                     <div class="price-container">

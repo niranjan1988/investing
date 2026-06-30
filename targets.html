@@ -10,6 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const theme = localStorage.getItem('stockpulse-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <style>
         /* Force left alignment for equal visual spacing */
         #stockTable th, #stockTable td {
@@ -46,6 +52,12 @@
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
                     Back to Dashboard
+                </a>
+                <a href="comments.html" class="theme-toggle" title="Comments" aria-label="Comments" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Comments
                 </a>
                 <div class="search-container" id="searchContainer" style="margin-left: 20px;">
                     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

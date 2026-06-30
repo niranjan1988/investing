@@ -55,25 +55,18 @@
     "KRYS",
     "PCTY",
     "DOCS",
-    "CLBT",
     "CPRX",
-    "SEZL",
-    "AUPH",
-    "IRMD",
     "GOOG",
     "RDDT",
     "ALAB",
     "CRDO",
-    "HRMY",
     "HCA",
     "TMDX",
     "RBRK",
     "AXON",
     "NBIS",
     "IREN",
-    "SOFI",
     "IONQ",
-    "CLPT",
     "VKTX",
     "OSCR",
     "CPRT",
@@ -96,17 +89,24 @@
     "TT",
     "DELL",
     "HUBB",
-    "BTC",
     "VST",
     "MTZ",
     "FIX",
     "CSCO",
     "CIEN",
     "FN",
-    "DLR",
     "STRL",
-    "EQIX",
-    "INTC"
+    "INTC",
+    "RMD",
+    "QCOM",
+    "ON",
+    "TXN",
+    "ORCL",
+    "NET",
+    "SKHY",
+    "MDB",
+    "SNOW",
+    "AMAT"
   ],
   "universe": [
     {
@@ -672,6 +672,26 @@
     {
       "ticker": "EQIX",
       "sector": "Real Estate"
+    },
+    {
+      "ticker": "RMD",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "QCOM",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "ON",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "SKHY",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AMAT",
+      "sector": "Technology"
     }
   ],
   "shortlisted": [
@@ -755,7 +775,8 @@
     "Crypto": [
       "COIN",
       "MSTR",
-      "BTC"
+      "BTC",
+      "HOOD"
     ],
     "Security": [
       "PANW",
@@ -769,57 +790,66 @@
       "AMD"
     ],
     "Buy Radar": [
-      "CEG",
       "NVDA",
-      "FN",
-      "ANET",
-      "MOD",
-      "MSTR",
-      "MPWR",
-      "IRMD",
-      "GOOG",
-      "UTHR",
-      "SPGI",
-      "SNPS",
-      "VRT",
-      "DXCM",
-      "AVGO",
-      "UI",
-      "MELI",
-      "RBRK",
-      "IONQ",
-      "CPRT",
-      "ISRG",
-      "NFLX",
-      "AXON",
-      "APPF",
-      "TEM",
-      "PTC",
-      "DOCS",
-      "ZS",
-      "CLBT",
-      "VEEV",
-      "ADSK",
       "MSFT",
-      "NOW",
-      "ADMA",
-      "PCTY",
-      "ADBE",
-      "HRMY",
-      "INTU",
-      "VKTX"
-    ],
-    "only downside": [
-      "ALAB",
-      "SEZL",
-      "KLAC"
-    ],
-    "only upside": [
-      "VKTX",
-      "PCTY",
-      "ADMA",
+      "META",
+      "MSTR",
       "ADSK",
-      "INTU"
+      "MU",
+      "GOOG",
+      "AMZN"
+    ],
+    "Buy after a fall": [
+      "AMD",
+      "PLTR",
+      "GOOG",
+      "ASML",
+      "TSM",
+      "AVGO",
+      "QCOM",
+      "ANET",
+      "LRCX",
+      "ON",
+      "TXN",
+      "ISRG",
+      "NOW",
+      "ZS",
+      "ADBE",
+      "CEG",
+      "ORCL",
+      "PANW",
+      "VRT",
+      "CRWD",
+      "NET",
+      "KLAC",
+      "CDNS",
+      "SNPS",
+      "MDB",
+      "SNOW",
+      "AMAT",
+      "VEEV"
+    ],
+    "To Analyse": [
+      "PTC",
+      "NVO",
+      "ADBE",
+      "INTU",
+      "RMD",
+      "CEG",
+      "NFLX"
+    ],
+    "Dont Buy": [
+      "AAPL",
+      "TSLA"
     ]
-  }
+  },
+  "comments": [
+    {
+      "id": "1782668336516",
+      "ticker": "CRDO",
+      "comment": "Dependent on a single company",
+      "sentiment": "neutral",
+      "timestamp": "2026-06-28T17:38:56.516Z"
+    }
+  ]
 }

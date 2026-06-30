@@ -403,14 +403,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Theme logic
-    const currentTheme = localStorage.getItem('theme') || 'dark';
+    const currentTheme = localStorage.getItem('stockpulse-theme') || 'light';
     document.documentElement.setAttribute('data-theme', currentTheme);
     
     themeToggle.addEventListener('click', () => {
         const theme = document.documentElement.getAttribute('data-theme');
         const newTheme = theme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
+        localStorage.setItem('stockpulse-theme', newTheme);
     });
 
     // Go to top

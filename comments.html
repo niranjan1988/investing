@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Comments | StockPulse</title>
+    <meta name="description" content="View and add comments and sentiments for tracked stocks.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const theme = localStorage.getItem('stockpulse-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <style>
+        #commentsTable th, #commentsTable td {
+            text-align: left !important;
+        }
+        .sentiment-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+        }
+        .sentiment-positive { background: var(--green-glow); color: var(--green-500); border-color: var(--green-500); }
+        .sentiment-neutral { background: rgba(148, 163, 184, 0.12); color: var(--text-secondary); border-color: var(--text-secondary); }
+        .sentiment-negative { background: var(--red-glow); color: var(--red-500); border-color: var(--red-500); }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                            <polyline points="16 7 22 7 22 13"></polyline>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>StockPulse</h1>
+                        <span class="logo-subtitle">COMMENTS</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-center" style="justify-content: flex-start; gap: 16px;">
+                <a href="index.html" class="theme-toggle" style="text-decoration: none; display: flex; align-items: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="targets.html" class="theme-toggle" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 16 16 12 12 8"></polyline>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    Price Targets
+                </a>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme" aria-label="Toggle theme">
+                    <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="dashboard-layout" style="flex-direction: column;">
+            <section class="table-section" style="max-width: 1200px; margin: 0 auto; margin-bottom: 2rem; width: 100%;">
+                <div class="table-container" style="padding: 24px;">
+                    <h2 style="margin-bottom: 20px; font-size: 1.2rem; color: var(--text-primary);">Add a Comment</h2>
+                    <form id="addCommentForm" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <label for="tickerSelect" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Select Stock</label>
+                            <select id="tickerSelect" required style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family);">
+                                <option value="" disabled selected>Loading stocks...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="commentInput" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem;">Comment</label>
+                            <textarea id="commentInput" required rows="4" placeholder="Share your thoughts on this stock..." style="width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-family); resize: vertical;"></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem;">Sentiment</label>
+                            <div style="display: flex; gap: 15px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="sentiment" value="positive" required>
+                                    <span class="sentiment-badge sentiment-positive">Positive</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="sentiment" value="neutral" required>
+                                    <span class="sentiment-badge sentiment-neutral">Neutral</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="sentiment" value="negative" required>
+                                    <span class="sentiment-badge sentiment-negative">Negative</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" id="submitBtn" style="margin-top: 10px; padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: background 0.2s; align-self: flex-start;">
+                            Submit Comment
+                        </button>
+                    </form>
+                </div>
+            </section>
+            
+            <section class="table-section" style="max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 40px;">
+                <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--text-primary);">Recent Comments</h3>
+                <div class="table-container" id="commentsTableContainer">
+                    <table class="stock-table" id="commentsTable" style="table-layout: fixed; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">Stock</th>
+                                <th style="width: 50%;">Comment</th>
+                                <th style="width: 15%;">Sentiment</th>
+                                <th style="width: 15%;">Date</th>
+                                <th style="width: 10%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commentsTableBody">
+                            <!-- Comments injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="no-results" id="noComments" style="display:none; margin-top: 2rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" style="margin-bottom:16px;">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <p>No comments added yet.</p>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script src="comments.js"></script>
+</body>
+
+</html>
