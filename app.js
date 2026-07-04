@@ -651,14 +651,14 @@ function openTradingViewPanel(ticker) {
         </iframe>
     `;
 
-    // Show panel
-    dashboardRight.style.display = 'flex';
+    // Show panel as modal
+    dashboardRight.classList.add('active');
 }
 
 function closeTradingViewPanel() {
     const dashboardRight = document.getElementById('dashboardRight');
     const chartPanelBody = document.getElementById('chartPanelBody');
-    dashboardRight.style.display = 'none';
+    dashboardRight.classList.remove('active');
     chartPanelBody.innerHTML = '';
 }
 
@@ -717,8 +717,11 @@ document.addEventListener('keydown', (e) => {
         if (sipCalcBtn) sipCalcBtn.click();
     }
     if (e.key === 'Escape') {
+        const dashboardRight = document.getElementById('dashboardRight');
         if (modalOverlay.classList.contains('active')) {
             closeModal();
+        } else if (dashboardRight && dashboardRight.classList.contains('active')) {
+            closeTradingViewPanel();
         } else {
             searchInput.blur();
             searchInput.value = '';
@@ -764,6 +767,12 @@ modalOverlay.addEventListener('click', (e) => {
 const closeChartPanelBtn = document.getElementById('closeChartPanelBtn');
 if (closeChartPanelBtn) {
     closeChartPanelBtn.addEventListener('click', closeTradingViewPanel);
+}
+const dashboardRightOverlay = document.getElementById('dashboardRight');
+if (dashboardRightOverlay) {
+    dashboardRightOverlay.addEventListener('click', (e) => {
+        if (e.target === dashboardRightOverlay) closeTradingViewPanel();
+    });
 }
 
 // Refresh button
@@ -1121,7 +1130,7 @@ function toggleTheme() {
     // Update TradingView widget if open
     const chartPanelTitle = document.getElementById('chartPanelTitle');
     const dashboardRight = document.getElementById('dashboardRight');
-    if (chartPanelTitle && chartPanelTitle.textContent && dashboardRight && dashboardRight.style.display !== 'none') {
+    if (chartPanelTitle && chartPanelTitle.textContent && dashboardRight && dashboardRight.classList.contains('active')) {
         const ticker = chartPanelTitle.textContent.split(' - ')[0];
         if (ticker) {
             openTradingViewPanel(ticker);

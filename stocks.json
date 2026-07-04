@@ -843,13 +843,5 @@
       "TSLA"
     ]
   },
-  "comments": [
-    {
-      "id": "1782668336516",
-      "ticker": "CRDO",
-      "comment": "Dependent on a single company",
-      "sentiment": "neutral",
-      "timestamp": "2026-06-28T17:38:56.516Z"
-    }
-  ]
+  "comments": []
 }

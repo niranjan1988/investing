@@ -13,7 +13,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script>
-        (function() {
+        (function () {
             const theme = localStorage.getItem('stockpulse-theme') || 'light';
             document.documentElement.setAttribute('data-theme', theme);
         })();
@@ -113,16 +113,20 @@
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                 </button>
-                <a href="targets.html" class="theme-toggle" title="Price Targets" aria-label="Price Targets" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                <a href="targets.html" class="theme-toggle" title="Price Targets" aria-label="Price Targets"
+                    style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width: 18px; height: 18px;">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 16 16 12 12 8"></polyline>
                         <line x1="8" y1="12" x2="16" y2="12"></line>
                     </svg>
                     Price Targets
                 </a>
-                <a href="comments.html" class="theme-toggle" title="Comments" aria-label="Comments" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                <a href="comments.html" class="theme-toggle" title="Comments" aria-label="Comments"
+                    style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 16px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width: 18px; height: 18px;">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
                     Comments
@@ -227,30 +231,36 @@
                         </svg>
                         <p>No stocks match your search</p>
                     </div>
-                    </div>
                 </section>
             </div> <!-- End dashboard-left -->
-
-            <div class="dashboard-right" id="dashboardRight" style="display: none;">
-                <div class="chart-panel-header">
-                    <h3 id="chartPanelTitle">TradingView</h3>
-                    <button class="close-chart-btn" id="closeChartPanelBtn" aria-label="Close chart">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div class="chart-panel-body" id="chartPanelBody">
-                    <!-- iframe injected here by JS -->
-                </div>
-            </div>
         </div> <!-- End dashboard-layout -->
 
         <!-- Footer -->
         <footer class="app-footer">
             <p>Live data from Yahoo Finance. For informational purposes only. Not financial advice.</p>
         </footer>
+    </div>
+
+    <!-- Chart Panel Modal -->
+    <div class="modal-overlay" id="dashboardRight"
+        style="background: none; backdrop-filter: none; pointer-events: none; justify-content: flex-end; padding: 20px;">
+        <div class="modal"
+            style="width: 50vw; max-width: none; height: 80vh; max-height: 80vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; pointer-events: auto; margin: 0; margin-top: auto; box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(0,0,0,0.1);">
+            <button class="modal-close" id="closeChartPanelBtn" style="z-index: 10;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header"
+                style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary);">
+                <h3 id="chartPanelTitle"
+                    style="margin: 0; font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">TradingView</h3>
+            </div>
+            <div class="chart-panel-body" id="chartPanelBody" style="flex: 1; width: 100%; height: 100%;">
+                <!-- iframe injected here by JS -->
+            </div>
+        </div>
     </div>
 
     <!-- Loading Overlay -->
