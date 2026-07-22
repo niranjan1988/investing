@@ -20,7 +20,6 @@
     "KLAC",
     "LRCX",
     "FTNT",
-    "ZS",
     "LLY",
     "VRTX",
     "TSM",
@@ -104,9 +103,11 @@
     "ORCL",
     "NET",
     "SKHY",
-    "MDB",
     "SNOW",
-    "AMAT"
+    "AMAT",
+    "AMKR",
+    "FORM",
+    "SNDK"
   ],
   "universe": [
     {
@@ -692,6 +693,18 @@
     {
       "ticker": "AMAT",
       "sector": "Technology"
+    },
+    {
+      "ticker": "AMKR",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "FORM",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "SNDK",
+      "sector": "Technology"
     }
   ],
   "shortlisted": [
@@ -761,7 +774,8 @@
       "PANW",
       "EQIX",
       "STRL",
-      "NVDA"
+      "NVDA",
+      "SKHY"
     ],
     "M7": [
       "NVDA",
@@ -787,7 +801,17 @@
       "NVDA",
       "TSM",
       "AVGO",
-      "AMD"
+      "AMD",
+      "MU",
+      "ASML",
+      "AMAT",
+      "LRCX",
+      "KLAC",
+      "MRVL",
+      "ANET",
+      "FORM",
+      "AMKR",
+      "SNDK"
     ],
     "Buy Radar": [
       "NVDA",

@@ -743,11 +743,11 @@ app.post('/api/comments', (req, res) => {
         if (!ticker || !comment || !sentiment) {
             return res.status(400).json({ error: 'Ticker, comment, and sentiment are required' });
         }
-        
+
         if (!IN_MEMORY_STOCKS.comments) {
             IN_MEMORY_STOCKS.comments = [];
         }
-        
+
         const newComment = {
             id: Date.now().toString(),
             ticker,
@@ -755,10 +755,10 @@ app.post('/api/comments', (req, res) => {
             sentiment,
             timestamp: new Date().toISOString()
         };
-        
+
         IN_MEMORY_STOCKS.comments.push(newComment);
         saveStocks();
-        
+
         res.json({ success: true, comment: newComment });
     } catch (err) {
         console.error('[API] Error adding comment:', err.message);
@@ -772,14 +772,14 @@ app.delete('/api/comments/:id', (req, res) => {
         if (!IN_MEMORY_STOCKS.comments) {
             return res.status(404).json({ error: 'No comments found' });
         }
-        
+
         const initialLength = IN_MEMORY_STOCKS.comments.length;
         IN_MEMORY_STOCKS.comments = IN_MEMORY_STOCKS.comments.filter(c => c.id !== id);
-        
+
         if (IN_MEMORY_STOCKS.comments.length === initialLength) {
             return res.status(404).json({ error: 'Comment not found' });
         }
-        
+
         saveStocks();
         res.json({ success: true });
     } catch (err) {

@@ -1090,7 +1090,7 @@ body::before {
 
 .modal-close {
     position: absolute;
-    top: 18px;
+    top: 7px;
     right: 18px;
     width: 36px;
     height: 36px;
