@@ -107,7 +107,16 @@
     "AMAT",
     "AMKR",
     "FORM",
-    "SNDK"
+    "SNDK",
+    "SPCX",
+    "MDT",
+    "SYK",
+    "ZBH",
+    "ARAY",
+    "TRXC",
+    "ROK",
+    "LMT",
+    "LHX"
   ],
   "universe": [
     {
@@ -705,6 +714,42 @@
     {
       "ticker": "SNDK",
       "sector": "Technology"
+    },
+    {
+      "ticker": "SPCX",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "MDT",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "SYK",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "ZBH",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "ARAY",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "TRXC",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "ROK",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "LMT",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "LHX",
+      "sector": "Industrials"
     }
   ],
   "shortlisted": [
@@ -862,9 +907,26 @@
       "CEG",
       "NFLX"
     ],
-    "Dont Buy": [
-      "AAPL",
-      "TSLA"
+    "Space": [
+      "SPCX",
+      "RKLB",
+      "LMT",
+      "LHX"
+    ],
+    "Robotics": [
+      "TSLA",
+      "NVDA",
+      "QCOM",
+      "ROK"
+    ],
+    "Drones": [],
+    "Precision Surgery": [
+      "ISRG",
+      "MDT",
+      "SYK",
+      "ZBH",
+      "ARAY",
+      "TRXC"
     ]
   },
   "comments": []

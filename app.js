@@ -471,11 +471,18 @@ function updateSummary() {
         ? allStocks.reduce((sum, s) => sum + Math.max(s.drawdown, 0), 0) / total
         : 0;
 
+    const m7Tickers = ['AAPL', 'MSFT', 'GOOG', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA'];
+    const m7Stocks = allStocks.filter(s => m7Tickers.includes(s.ticker));
+    const m7AvgDrawdown = m7Stocks.length > 0
+        ? m7Stocks.reduce((sum, s) => sum + Math.max(s.drawdown, 0), 0) / m7Stocks.length
+        : 0;
+
     animateCounter('totalStocksValue', total);
     animateCounter('athCountValue', atAth);
     animateCounter('nearAthValue', nearAth);
     animateCounter('deepDrawdownValue', deepDrawdown);
     document.getElementById('avgDrawdownValue').textContent = avgDrawdown.toFixed(1) + '%';
+    document.getElementById('m7AvgDrawdownValue').textContent = m7AvgDrawdown.toFixed(1) + '%';
 }
 
 function animateCounter(elementId, target) {
