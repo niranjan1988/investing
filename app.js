@@ -207,11 +207,17 @@ function showError(message) {
 // ============================================
 
 function getFilteredAndSortedStocks() {
-    let stocks = stocksData.map(s => ({
-        ...s,
-        drawdown: calcDrawdown(s.price, s.ath),
-        drawdownLevel: getDrawdownLevel(calcDrawdown(s.price, s.ath))
-    }));
+    let stocks = stocksData.map(s => {
+        const change1D = (s.previousClose > 0 && s.price)
+            ? ((s.price - s.previousClose) / s.previousClose) * 100
+            : -Infinity;
+        return {
+            ...s,
+            drawdown: calcDrawdown(s.price, s.ath),
+            drawdownLevel: getDrawdownLevel(calcDrawdown(s.price, s.ath)),
+            change1D
+        };
+    });
 
     // Apply search
     if (searchQuery) {
@@ -276,6 +282,9 @@ function getFilteredAndSortedStocks() {
                 break;
             case 'price':
                 comparison = b.price - a.price;
+                break;
+            case 'change1D':
+                comparison = (b.change1D ?? -Infinity) - (a.change1D ?? -Infinity);
                 break;
             case 'pe':
                 const peA = (a.pe == null || isNaN(Number(a.pe))) ? -Infinity : Number(a.pe);

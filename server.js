@@ -2,18 +2,18 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = 4000;
 
 // ============================================
 // Yahoo Finance Ticker Mapping
 // ============================================
 function toYahooTicker(ticker) {
-    const map = { 'BRK.B': 'BRK-B' };
+    const map = {'BRK.B': 'BRK-B'};
     return map[ticker] || ticker;
 }
 
 function fromYahooTicker(yahooTicker) {
-    const map = { 'BRK-B': 'BRK.B' };
+    const map = {'BRK-B': 'BRK.B'};
     return map[yahooTicker] || yahooTicker;
 }
 
@@ -22,7 +22,7 @@ const fs = require('fs');
 // ============================================
 // Stock Universe - Technology & Healthcare Only
 // ============================================
-let IN_MEMORY_STOCKS = { active: [], universe: [], shortlisted: [] };
+let IN_MEMORY_STOCKS = {active: [], universe: [], shortlisted: []};
 
 function loadStocks() {
     try {
@@ -68,14 +68,14 @@ const YAHOO_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (
 
 async function getYahooAuth() {
     if (yahooCrumb && yahooCookies && (Date.now() - authTime < AUTH_TTL)) {
-        return { crumb: yahooCrumb, cookies: yahooCookies };
+        return {crumb: yahooCrumb, cookies: yahooCookies};
     }
 
     console.log('[Yahoo] Refreshing authentication...');
 
     // Step 1: Get cookies from fc.yahoo.com
     const cookieResp = await fetch('https://fc.yahoo.com', {
-        headers: { 'User-Agent': YAHOO_UA },
+        headers: {'User-Agent': YAHOO_UA},
         redirect: 'manual',
     });
     const setCookies = cookieResp.headers.getSetCookie?.() || [];
@@ -100,7 +100,7 @@ async function getYahooAuth() {
     authTime = Date.now();
 
     console.log('[Yahoo] Authentication successful');
-    return { crumb, cookies: cookieStr };
+    return {crumb, cookies: cookieStr};
 }
 
 // ============================================
@@ -126,7 +126,7 @@ const TARGETS_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
  * Returns a map of ticker -> { price, mcap, name, fiftyTwoWeekHigh }
  */
 async function fetchBatchQuotes(tickers) {
-    const { crumb, cookies } = await getYahooAuth();
+    const {crumb, cookies} = await getYahooAuth();
     const yahooTickers = tickers.map(toYahooTicker);
 
     // Yahoo allows up to ~200 symbols per request
@@ -199,8 +199,8 @@ async function fetchATH(ticker) {
         const url6mo = `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=6mo&interval=1d`;
 
         const [resMax, res6mo] = await Promise.all([
-            fetch(urlMax, { headers: { 'User-Agent': YAHOO_UA } }),
-            fetch(url6mo, { headers: { 'User-Agent': YAHOO_UA } })
+            fetch(urlMax, {headers: {'User-Agent': YAHOO_UA}}),
+            fetch(url6mo, {headers: {'User-Agent': YAHOO_UA}})
         ]);
 
         let ath = 0;
@@ -245,7 +245,7 @@ async function fetchATH(ticker) {
             console.warn(`[Yahoo] 6mo chart fetch failed with status ${res6mo.status} for ${ticker}`);
         }
 
-        const dataObj = { value: ath, past1Y, past3Y, past5Y, past10Y, ma100, time: Date.now() };
+        const dataObj = {value: ath, past1Y, past3Y, past5Y, past10Y, ma100, time: Date.now()};
         athCache[ticker] = dataObj;
         return dataObj;
     } catch (err) {
@@ -286,12 +286,12 @@ async function fetchAllATHs(tickers, concurrency = 8) {
  * Fetch analyst targets for a single ticker.
  */
 async function fetchTarget(ticker) {
-    const { crumb, cookies } = await getYahooAuth();
+    const {crumb, cookies} = await getYahooAuth();
     const yahooTicker = toYahooTicker(ticker);
     try {
         const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${yahooTicker}?modules=financialData,price&crumb=${encodeURIComponent(crumb)}`;
         const response = await fetch(url, {
-            headers: { 'User-Agent': YAHOO_UA, 'Cookie': cookies }
+            headers: {'User-Agent': YAHOO_UA, 'Cookie': cookies}
         });
         if (!response.ok) throw new Error(`Status ${response.status}`);
         const data = await response.json();
@@ -425,7 +425,7 @@ app.get('/api/stocks', async (req, res) => {
         res.json(responseData);
     } catch (err) {
         console.error('[API] Error:', err.message);
-        res.status(500).json({ error: 'Failed to fetch stock data', message: err.message });
+        res.status(500).json({error: 'Failed to fetch stock data', message: err.message});
     }
 });
 
@@ -437,7 +437,7 @@ app.get('/api/news/:ticker', async (req, res) => {
         const ticker = req.params.ticker;
         const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${ticker}&newsCount=5`;
         const response = await fetch(url, {
-            headers: { 'User-Agent': YAHOO_UA }
+            headers: {'User-Agent': YAHOO_UA}
         });
 
         if (!response.ok) {
@@ -446,10 +446,10 @@ app.get('/api/news/:ticker', async (req, res) => {
 
         const data = await response.json();
         const news = data.news || [];
-        res.json({ news });
+        res.json({news});
     } catch (err) {
         console.error(`[API] News Error for ${req.params.ticker}:`, err.message);
-        res.status(500).json({ error: 'Failed to fetch news', message: err.message });
+        res.status(500).json({error: 'Failed to fetch news', message: err.message});
     }
 });
 
@@ -505,7 +505,7 @@ app.get('/api/targets', async (req, res) => {
         res.json(responseData);
     } catch (err) {
         console.error('[API] Error:', err.message);
-        res.status(500).json({ error: 'Failed to fetch target data', message: err.message });
+        res.status(500).json({error: 'Failed to fetch target data', message: err.message});
     }
 });
 
@@ -518,9 +518,9 @@ app.use(express.json());
 // API route to change the active state of a stock
 app.post('/api/stocks/toggle', (req, res) => {
     try {
-        const { ticker, active } = req.body;
+        const {ticker, active} = req.body;
         if (!ticker) {
-            return res.status(400).json({ error: 'Ticker is required' });
+            return res.status(400).json({error: 'Ticker is required'});
         }
 
         let newActive = new Set(IN_MEMORY_STOCKS.active);
@@ -534,19 +534,19 @@ app.post('/api/stocks/toggle', (req, res) => {
         saveStocks();
         fullDataCache = null; // invalidate cache
 
-        res.json({ success: true, active: IN_MEMORY_STOCKS.active });
+        res.json({success: true, active: IN_MEMORY_STOCKS.active});
     } catch (err) {
         console.error('[API] Error in toggle:', err.message);
-        res.status(500).json({ error: 'Failed to toggle stock' });
+        res.status(500).json({error: 'Failed to toggle stock'});
     }
 });
 
 // API route to add multiple new stocks
 app.post('/api/stocks/add-bulk', async (req, res) => {
     try {
-        const { tickers } = req.body;
+        const {tickers} = req.body;
         if (!tickers || !Array.isArray(tickers) || tickers.length === 0) {
-            return res.status(400).json({ error: 'Tickers array is required' });
+            return res.status(400).json({error: 'Tickers array is required'});
         }
 
         const addedTickers = [];
@@ -567,7 +567,7 @@ app.post('/api/stocks/add-bulk', async (req, res) => {
             let sector = 'Unknown';
             try {
                 const searchUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${cleanTicker}&quotesCount=1`;
-                const searchRes = await fetch(searchUrl, { headers: { 'User-Agent': YAHOO_UA } });
+                const searchRes = await fetch(searchUrl, {headers: {'User-Agent': YAHOO_UA}});
                 if (searchRes.ok) {
                     const searchData = await searchRes.json();
                     if (searchData.quotes && searchData.quotes.length > 0) {
@@ -578,7 +578,7 @@ app.post('/api/stocks/add-bulk', async (req, res) => {
                 console.error(`[API] Failed to fetch sector for ${cleanTicker}`, e);
             }
 
-            IN_MEMORY_STOCKS.universe.push({ ticker: cleanTicker, sector });
+            IN_MEMORY_STOCKS.universe.push({ticker: cleanTicker, sector});
 
             // Ensure it's active
             let newActive = new Set(IN_MEMORY_STOCKS.active);
@@ -592,13 +592,13 @@ app.post('/api/stocks/add-bulk', async (req, res) => {
         fullDataCache = null; // invalidate cache
 
         if (addedTickers.length === 0 && ignoredTickers.length > 0) {
-            return res.status(400).json({ error: 'All provided stocks already exist (or are deactivated).' });
+            return res.status(400).json({error: 'All provided stocks already exist (or are deactivated).'});
         }
 
-        res.json({ success: true, added: addedTickers, ignored: ignoredTickers });
+        res.json({success: true, added: addedTickers, ignored: ignoredTickers});
     } catch (err) {
         console.error('[API] Error adding bulk stocks:', err.message);
-        res.status(500).json({ error: 'Failed to add stocks' });
+        res.status(500).json({error: 'Failed to add stocks'});
     }
 });
 
@@ -606,27 +606,27 @@ app.get('/api/deactivated', (req, res) => {
     try {
         const activeTickers = new Set(IN_MEMORY_STOCKS.active);
         const deactivated = IN_MEMORY_STOCKS.universe.filter(s => !activeTickers.has(s.ticker));
-        res.json({ stocks: deactivated });
+        res.json({stocks: deactivated});
     } catch (err) {
-        res.status(500).json({ error: 'Failed' });
+        res.status(500).json({error: 'Failed'});
     }
 });
 
 // API route to get shortlisted stocks
 app.get('/api/shortlisted', (req, res) => {
     try {
-        res.json({ shortlisted: IN_MEMORY_STOCKS.shortlisted || [] });
+        res.json({shortlisted: IN_MEMORY_STOCKS.shortlisted || []});
     } catch (err) {
-        res.status(500).json({ error: 'Failed' });
+        res.status(500).json({error: 'Failed'});
     }
 });
 
 // API route to toggle shortlist status
 app.post('/api/shortlisted/toggle', (req, res) => {
     try {
-        const { ticker, shortlisted } = req.body;
+        const {ticker, shortlisted} = req.body;
         if (!ticker) {
-            return res.status(400).json({ error: 'Ticker is required' });
+            return res.status(400).json({error: 'Ticker is required'});
         }
 
         let newShortlisted = new Set(IN_MEMORY_STOCKS.shortlisted || []);
@@ -639,10 +639,10 @@ app.post('/api/shortlisted/toggle', (req, res) => {
         IN_MEMORY_STOCKS.shortlisted = Array.from(newShortlisted);
         saveStocks();
 
-        res.json({ success: true, shortlisted: IN_MEMORY_STOCKS.shortlisted });
+        res.json({success: true, shortlisted: IN_MEMORY_STOCKS.shortlisted});
     } catch (err) {
         console.error('[API] Error in shortlist toggle:', err.message);
-        res.status(500).json({ error: 'Failed to toggle shortlist' });
+        res.status(500).json({error: 'Failed to toggle shortlist'});
     }
 });
 
@@ -653,60 +653,60 @@ app.post('/api/shortlisted/toggle', (req, res) => {
 // Get all buckets
 app.get('/api/buckets', (req, res) => {
     try {
-        res.json({ buckets: IN_MEMORY_STOCKS.buckets || {} });
+        res.json({buckets: IN_MEMORY_STOCKS.buckets || {}});
     } catch (err) {
-        res.status(500).json({ error: 'Failed to get buckets' });
+        res.status(500).json({error: 'Failed to get buckets'});
     }
 });
 
 // Create a new bucket
 app.post('/api/buckets/create', (req, res) => {
     try {
-        const { name } = req.body;
+        const {name} = req.body;
         if (!name || !name.trim()) {
-            return res.status(400).json({ error: 'Bucket name is required' });
+            return res.status(400).json({error: 'Bucket name is required'});
         }
         const bucketName = name.trim();
         if (IN_MEMORY_STOCKS.buckets[bucketName]) {
-            return res.status(400).json({ error: 'Bucket already exists' });
+            return res.status(400).json({error: 'Bucket already exists'});
         }
         IN_MEMORY_STOCKS.buckets[bucketName] = [];
         saveStocks();
-        res.json({ success: true, buckets: IN_MEMORY_STOCKS.buckets });
+        res.json({success: true, buckets: IN_MEMORY_STOCKS.buckets});
     } catch (err) {
         console.error('[API] Error creating bucket:', err.message);
-        res.status(500).json({ error: 'Failed to create bucket' });
+        res.status(500).json({error: 'Failed to create bucket'});
     }
 });
 
 // Delete a bucket
 app.post('/api/buckets/delete', (req, res) => {
     try {
-        const { name } = req.body;
+        const {name} = req.body;
         if (!name) {
-            return res.status(400).json({ error: 'Bucket name is required' });
+            return res.status(400).json({error: 'Bucket name is required'});
         }
         if (!IN_MEMORY_STOCKS.buckets[name]) {
-            return res.status(404).json({ error: 'Bucket not found' });
+            return res.status(404).json({error: 'Bucket not found'});
         }
         delete IN_MEMORY_STOCKS.buckets[name];
         saveStocks();
-        res.json({ success: true, buckets: IN_MEMORY_STOCKS.buckets });
+        res.json({success: true, buckets: IN_MEMORY_STOCKS.buckets});
     } catch (err) {
         console.error('[API] Error deleting bucket:', err.message);
-        res.status(500).json({ error: 'Failed to delete bucket' });
+        res.status(500).json({error: 'Failed to delete bucket'});
     }
 });
 
 // Toggle a stock in a bucket
 app.post('/api/buckets/toggle', (req, res) => {
     try {
-        const { bucket, ticker, add } = req.body;
+        const {bucket, ticker, add} = req.body;
         if (!bucket || !ticker) {
-            return res.status(400).json({ error: 'Bucket name and ticker are required' });
+            return res.status(400).json({error: 'Bucket name and ticker are required'});
         }
         if (!IN_MEMORY_STOCKS.buckets[bucket]) {
-            return res.status(404).json({ error: 'Bucket not found' });
+            return res.status(404).json({error: 'Bucket not found'});
         }
         const tickers = new Set(IN_MEMORY_STOCKS.buckets[bucket]);
         if (add) {
@@ -716,10 +716,10 @@ app.post('/api/buckets/toggle', (req, res) => {
         }
         IN_MEMORY_STOCKS.buckets[bucket] = Array.from(tickers);
         saveStocks();
-        res.json({ success: true, buckets: IN_MEMORY_STOCKS.buckets });
+        res.json({success: true, buckets: IN_MEMORY_STOCKS.buckets});
     } catch (err) {
         console.error('[API] Error toggling bucket:', err.message);
-        res.status(500).json({ error: 'Failed to toggle bucket stock' });
+        res.status(500).json({error: 'Failed to toggle bucket stock'});
     }
 });
 
@@ -731,17 +731,17 @@ app.get('/api/comments', (req, res) => {
     try {
         // Return comments, sorted by timestamp descending
         const comments = (IN_MEMORY_STOCKS.comments || []).slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        res.json({ comments });
+        res.json({comments});
     } catch (err) {
-        res.status(500).json({ error: 'Failed to get comments' });
+        res.status(500).json({error: 'Failed to get comments'});
     }
 });
 
 app.post('/api/comments', (req, res) => {
     try {
-        const { ticker, comment, sentiment } = req.body;
+        const {ticker, comment, sentiment} = req.body;
         if (!ticker || !comment || !sentiment) {
-            return res.status(400).json({ error: 'Ticker, comment, and sentiment are required' });
+            return res.status(400).json({error: 'Ticker, comment, and sentiment are required'});
         }
 
         if (!IN_MEMORY_STOCKS.comments) {
@@ -759,10 +759,10 @@ app.post('/api/comments', (req, res) => {
         IN_MEMORY_STOCKS.comments.push(newComment);
         saveStocks();
 
-        res.json({ success: true, comment: newComment });
+        res.json({success: true, comment: newComment});
     } catch (err) {
         console.error('[API] Error adding comment:', err.message);
-        res.status(500).json({ error: 'Failed to add comment' });
+        res.status(500).json({error: 'Failed to add comment'});
     }
 });
 
@@ -770,21 +770,21 @@ app.delete('/api/comments/:id', (req, res) => {
     try {
         const id = req.params.id;
         if (!IN_MEMORY_STOCKS.comments) {
-            return res.status(404).json({ error: 'No comments found' });
+            return res.status(404).json({error: 'No comments found'});
         }
 
         const initialLength = IN_MEMORY_STOCKS.comments.length;
         IN_MEMORY_STOCKS.comments = IN_MEMORY_STOCKS.comments.filter(c => c.id !== id);
 
         if (IN_MEMORY_STOCKS.comments.length === initialLength) {
-            return res.status(404).json({ error: 'Comment not found' });
+            return res.status(404).json({error: 'Comment not found'});
         }
 
         saveStocks();
-        res.json({ success: true });
+        res.json({success: true});
     } catch (err) {
         console.error('[API] Error deleting comment:', err.message);
-        res.status(500).json({ error: 'Failed to delete comment' });
+        res.status(500).json({error: 'Failed to delete comment'});
     }
 });
 
@@ -828,7 +828,7 @@ app.get('/api/sip/:ticker', async (req, res) => {
         const yahooTicker = toYahooTicker(ticker);
         const url = `https://query2.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=10y&interval=1mo`;
 
-        const response = await fetch(url, { headers: { 'User-Agent': YAHOO_UA } });
+        const response = await fetch(url, {headers: {'User-Agent': YAHOO_UA}});
         if (!response.ok) throw new Error('Failed to fetch chart data');
 
         const data = await response.json();
@@ -851,7 +851,7 @@ app.get('/api/sip/:ticker', async (req, res) => {
                     // Update the close to the latest, but keep the original open price as the entry point
                     validData[validData.length - 1].close = closes[i];
                 } else {
-                    validData.push({ time: timestamps[i], close: closes[i], open: openPrice });
+                    validData.push({time: timestamps[i], close: closes[i], open: openPrice});
                     lastMonthStr = monthStr;
                 }
             }
@@ -898,7 +898,7 @@ app.get('/api/sip/:ticker', async (req, res) => {
 
     } catch (err) {
         console.error('[API] SIP error:', err.message);
-        res.status(500).json({ error: 'Failed to calculate SIP', message: err.message });
+        res.status(500).json({error: 'Failed to calculate SIP', message: err.message});
     }
 });
 

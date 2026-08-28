@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy / Sell Calculator | StockPulse</title>
+    <meta name="description" content="Calculate stock purchase quantities and position percentage changes.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('stockpulse-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <style>
+        .buysell-card {
+            max-width: 520px;
+            margin: 30px auto;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md, 8px);
+            padding: 28px 24px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .buysell-card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+        }
+
+        .buysell-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+        }
+
+        .buysell-form-group {
+            margin-bottom: 14px;
+        }
+
+        .buysell-form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .buysell-form-group select,
+        .buysell-form-group input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm, 6px);
+            background-color: var(--bg-tertiary, #ffffff);
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s ease;
+            font-family: inherit;
+        }
+
+        .buysell-form-group select:focus,
+        .buysell-form-group input[type="number"]:focus {
+            border-color: var(--accent-blue, #2563eb);
+        }
+
+        .buysell-stock-details {
+            margin-top: 18px;
+        }
+
+        .buysell-details-text p {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .buysell-details-text strong {
+            color: var(--text-primary);
+            min-width: 140px;
+            display: inline-block;
+        }
+
+        .buysell-divider {
+            border: 0;
+            border-top: 1px solid var(--border-color);
+            margin: 16px 0;
+        }
+
+        .buysell-section-divider {
+            border: 0;
+            border-top: 2px solid var(--border-color);
+            margin: 24px 0;
+        }
+
+        .buysell-result-text {
+            margin-top: 12px;
+            font-size: 0.95rem;
+        }
+
+        .buysell-result-text p {
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .buysell-result-text strong {
+            color: var(--text-primary);
+            min-width: 155px;
+            display: inline-block;
+        }
+
+        .buysell-change-val {
+            font-weight: 600;
+            color: var(--green-500, #16a34a);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                            <polyline points="16 7 22 7 22 13"></polyline>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>StockPulse</h1>
+                        <span class="logo-subtitle">BUY / SELL CALCULATOR</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-center" style="justify-content: flex-start; gap: 12px; flex-wrap: wrap;">
+                <a href="index.html" class="theme-toggle" style="text-decoration: none; display: flex; align-items: center; gap: 8px; width: auto; padding: 0 14px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="targets.html" class="theme-toggle" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 14px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 16 16 12 12 8"></polyline>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    Price Targets
+                </a>
+                <a href="comments.html" class="theme-toggle" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 14px; font-weight: 500;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Comments
+                </a>
+                <a href="buysell.html" class="theme-toggle active" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 14px; font-weight: 600; border-color: var(--accent-blue);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Buy / Sell
+                </a>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme" aria-label="Toggle theme">
+                    <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-layout" style="flex-direction: column;">
+            <div class="buysell-card">
+                <h2>Stock Portfolio Position</h2>
+
+                <!-- Section 1: Main Section -->
+                <div class="buysell-section">
+                    <div class="buysell-form-group">
+                        <label for="tickerSelect">Select Stock:</label>
+                        <select id="tickerSelect">
+                            <option value="" disabled selected>-- Select a stock --</option>
+                        </select>
+                    </div>
+
+                    <!-- Stock Details as Plain Text -->
+                    <div id="stockDetails" class="buysell-stock-details" style="display: none;">
+                        <div class="buysell-details-text">
+                            <p><strong>Current Quantity:</strong> <span id="currentQty"></span></p>
+                            <p><strong>Avg Buy Price:</strong> <span id="avgBuyPrice"></span></p>
+                            <p><strong>Allocation:</strong> <span id="allocation"></span></p>
+                        </div>
+
+                        <hr class="buysell-divider">
+
+                        <!-- Quantity Input -->
+                        <div class="buysell-form-group">
+                            <label for="purchaseQtyInput">Enter Quantity:</label>
+                            <input 
+                                type="number" 
+                                id="purchaseQtyInput" 
+                                placeholder="Enter quantity" 
+                                min="0" 
+                                step="any"
+                            />
+                        </div>
+
+                        <!-- Percentage Change Display -->
+                        <div class="buysell-result-text">
+                            <p><strong>Percentage Change:</strong> <span id="percentageChange" class="buysell-change-val">0.00%</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Calculate Stock to Buy using % Change from Section 1 -->
+                <hr class="buysell-section-divider">
+
+                <div class="buysell-section">
+                    <h3>Calculate Stock to Buy based on % Change</h3>
+
+                    <div class="buysell-form-group">
+                        <label for="calcCurrentQtyInput">Enter Current Quantity:</label>
+                        <input 
+                            type="number" 
+                            id="calcCurrentQtyInput" 
+                            placeholder="Enter current quantity" 
+                            min="0" 
+                            step="any"
+                        />
+                    </div>
+
+                    <!-- Stock to Buy Display -->
+                    <div class="buysell-result-text">
+                        <p><strong>Stock to Buy:</strong> <span id="calcStockToBuy" class="buysell-change-val">0</span></p>
+                        <p><strong>New Total Quantity:</strong> <span id="calcNewTotalQty">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="buysell.js"></script>
+</body>
+</html>
